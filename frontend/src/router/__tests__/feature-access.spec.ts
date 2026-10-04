@@ -6,12 +6,6 @@ type NavigationGuard = (
   next: ReturnType<typeof vi.fn>
 ) => Promise<void>
 
-const gatewayProfile = vi.hoisted(() => ({ enabled: false }))
-vi.mock('@/config/everplain', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/config/everplain')>()
-  return { ...actual, isGatewayRouteBlocked: (path: string) => gatewayProfile.enabled && actual.isGatewayRouteBlocked(path) }
-})
-
 const routerHarness = vi.hoisted(() => ({
   guard: null as NavigationGuard | null,
 }))
@@ -214,19 +208,5 @@ describe('subscription route guard (opt-out flag)', () => {
     await navigation
 
     expect(next).toHaveBeenCalledWith('/admin/dashboard')
-  })
-})
-
-
-describe('standalone gateway route closure', () => {
-  it.each(['/purchase', '/payment/result', '/admin/orders', '/subscriptions', '/admin/affiliates/invites', '/register', '/auth/callback', '/model-plaza'])('closes %s without waiting for public settings', async path => {
-    gatewayProfile.enabled = true
-    appStore.publicSettingsLoaded = false
-    appStore.fetchPublicSettings.mockReset()
-    const { navigation, next } = runGuard({ requiresAuth: false }, path)
-    await navigation
-    expect(next).toHaveBeenCalledWith('/login')
-    expect(appStore.fetchPublicSettings).not.toHaveBeenCalled()
-    gatewayProfile.enabled = false
   })
 })

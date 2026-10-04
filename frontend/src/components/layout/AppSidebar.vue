@@ -18,7 +18,7 @@
         class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl shadow-glow transition-opacity hover:opacity-80"
         @click="handleMenuItemClick(homePath)"
       >
-        <EverplainMark v-if="EVERPLAIN_GATEWAY_PROFILE && !siteLogo" class="h-full w-full" />
+        <EverplainMark v-if="EVERPLAIN_BRANDING && !siteLogo" class="h-full w-full" />
         <img v-else-if="settingsLoaded" :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
       </router-link>
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
@@ -30,8 +30,8 @@
           {{ siteName }}
         </router-link>
         <!-- Version Badge -->
-        <span v-if="EVERPLAIN_GATEWAY_PROFILE" class="everplain-brand-caption">Gateway</span>
-        <VersionBadge v-else :version="siteVersion" />
+        <span v-if="EVERPLAIN_BRANDING" class="everplain-brand-caption">Gateway</span>
+        <VersionBadge :version="siteVersion" />
       </div>
     </div>
 
@@ -110,7 +110,7 @@
         </div>
 
         <!-- Personal Section for Admin (hidden in simple mode) -->
-        <div v-if="!EVERPLAIN_GATEWAY_PROFILE && !authStore.isSimpleMode" class="sidebar-section">
+        <div v-if="!authStore.isSimpleMode" class="sidebar-section">
           <div class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
             <span class="sidebar-section-title-text" :class="{ 'sidebar-section-title-text-collapsed': sidebarCollapsed }">
               {{ t('nav.myAccount') }}
@@ -200,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
+import { EVERPLAIN_BRANDING } from '@/config/everplain'
 import { useMediaQuery } from '@vueuse/core'
 import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -278,7 +278,7 @@ const homePath = computed(() => (isAdmin.value ? '/admin/dashboard' : '/dashboar
 const groupExpandOverrides = ref<Map<string, boolean>>(new Map())
 
 // Site settings from appStore (cached, no flicker)
-const siteName = computed(() => EVERPLAIN_GATEWAY_PROFILE && appStore.siteName === 'Everplain Gateway' ? 'Everplain' : appStore.siteName)
+const siteName = computed(() => EVERPLAIN_BRANDING && appStore.siteName === 'Everplain Gateway' ? 'Everplain' : appStore.siteName)
 const siteLogo = computed(() => sanitizeUrl(appStore.siteLogo || '', { allowRelative: true, allowDataUrl: true }))
 const siteVersion = computed(() => appStore.siteVersion)
 const settingsLoaded = computed(() => appStore.publicSettingsLoaded)
@@ -735,12 +735,6 @@ const flagBatchImageAccess = () => canUseBatchImage.value
 // 条目顺序：密钥 → 用量 → 可用渠道 → 渠道状态 → 订阅/支付 → 兑换/资料。
 // 可用渠道紧挨渠道状态之上，让用户"先看自己能用什么、再看对应状态"。
 function buildSelfNavItems(withDashboard: boolean): NavItem[] {
-  if (EVERPLAIN_GATEWAY_PROFILE) return [
-    ...(withDashboard ? [{ path: '/dashboard', label: t('everplain.overview'), icon: DashboardIcon }] : []),
-    { path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon },
-    { path: '/usage', label: t('nav.usage'), icon: ChartIcon },
-    { path: '/profile', label: t('nav.profile'), icon: UserIcon },
-  ]
   const items: NavItem[] = []
   if (withDashboard) {
     items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: DashboardIcon })
@@ -797,14 +791,6 @@ const customMenuItemsForAdmin = computed(() => {
 
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
-  if (EVERPLAIN_GATEWAY_PROFILE) return [
-    { path: '/admin/dashboard', label: t('everplain.overview'), icon: DashboardIcon },
-    { path: '/admin/accounts', label: t('everplain.upstreamAccounts'), icon: GlobeIcon },
-    { path: '/admin/groups', label: t('everplain.modelRouting'), icon: FolderIcon },
-    { path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon },
-    { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon },
-    { path: '/admin/settings', label: t('nav.settings'), icon: CogIcon },
-  ]
   const baseItems: NavItem[] = [
     { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon },
     { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring },
@@ -1007,7 +993,7 @@ watch(
 
 onMounted(() => {
   document.addEventListener('keydown', handleMobileKeyboard)
-  if (!EVERPLAIN_GATEWAY_PROFILE) void refreshBatchImageAccess()
+  void refreshBatchImageAccess()
   if (isAdmin.value) {
     adminSettingsStore.fetch()
   }

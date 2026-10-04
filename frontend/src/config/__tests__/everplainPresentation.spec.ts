@@ -16,6 +16,11 @@ describe('Everplain presentation and accessibility contract', () => {
     expect(css).toContain('animation-iteration-count: 1 !important')
     expect(css).toContain('(max-width: 479px)')
   })
+  it('keeps dark table and filter foregrounds on semantic ink tokens', () => {
+    expect(css).toContain(':root.dark .everplain-shell :is(.dark\\:text-gray-50')
+    expect(css).toContain('button.select-trigger .select-value { color: var(--qx-color-ink)')
+    expect(css).toContain('.table-wrapper .sticky-header-cell { background-color: var(--qx-color-surface-muted)')
+  })
   it('keeps the closed mobile sidebar inert and supports Escape, focus wrap, and focus return', () => {
     expect(sidebar).toContain(':inert="isMobileViewport && !mobileOpen"')
     expect(sidebar).toContain("event.key === 'Escape'")

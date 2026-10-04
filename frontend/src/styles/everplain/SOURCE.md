@@ -10,7 +10,7 @@ Retrieved from `huyanxius/everplain` via the authorized GitHub connector on 2026
 
 `adapter.css` maps the upstream Vue class names onto Everplain's semantic surfaces, ink accent, serif headings, 13px minimum metadata, pill controls, object-specific radii, focus ring, spacing, shadows, and motion. The Tailwind config keeps upstream utility names with token-backed palettes. Colored status/category utilities retain their semantics. `html.dark` selects `color-scheme: dark`, which makes the original `light-dark()` values honor the saved appearance choice.
 
-The gateway overview is a new read-only composition of the original component conventions. Existing account, group/model routing, API key, usage, and settings logic stays in Vue and is not replaced with a mock implementation. The gateway profile closes commerce and public registration routes in addition to the backend boundary; it is not an authorization substitute.
+All upstream pages and interactions remain in Vue. Existing account, group/model routing, API key, usage, commerce, registration, and settings logic is not replaced by mock implementations. Everplain branding and tokens do not disable routes or alter upstream permissions. The earlier restrictive gateway profile has been removed.
 
 Modern browser support for CSS `light-dark()` and `color-mix()` is required, matching the canonical Web token source. Fonts use the original system fallback stacks; no proprietary fonts are redistributed.
 

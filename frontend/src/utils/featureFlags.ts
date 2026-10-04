@@ -68,7 +68,6 @@
  * `makeSidebarFlag(flag)` returns a `() => boolean | undefined` compatible with
  * `AppSidebar.NavItem.featureFlag`, where `false` hides the menu entry.
  */
-import { GATEWAY_DISABLED_FEATURES } from '@/config/everplain'
 import { useAppStore } from '@/stores/app'
 import type { PublicSettings } from '@/types'
 import { DEFAULT_INTERVAL_SECONDS } from '@/constants/channelMonitor'
@@ -145,7 +144,6 @@ export type RegisteredFeatureFlag = keyof typeof FeatureFlags
  * `false` → the feature is disabled (menu/route should hide).
  */
 export function isFeatureFlagEnabled(flag: FeatureFlagDefinition): boolean {
-  if (GATEWAY_DISABLED_FEATURES.has(flag.key)) return false
   const appStore = useAppStore()
   return resolveFeatureFlag(appStore.cachedPublicSettings, flag)
 }

@@ -6,7 +6,7 @@ Reviewed 2026-10-04. This is an engineering readiness note, not legal clearance.
 
 Google's [Antigravity terms](https://antigravity.google/terms), section 6, prohibit accessing the consumer service using third-party software with Antigravity OAuth and warn of suspension or termination. An account owner's permission does not change Google's service terms. This is a material service-terms risk for personal subscription OAuth in this gateway; the operator must decide whether to proceed.
 
-The retained upstream implementation uses `cloudcode-pa.googleapis.com/v1internal:*` and Google's OAuth flow (`backend/internal/pkg/antigravity/oauth.go` and `client.go`). Its presence in open source does not make it a supported public Google model API. It is not the new official Antigravity SDK. The fork has not configured or verified this adapter, and upstream requests remain off by default.
+The retained upstream implementation uses `cloudcode-pa.googleapis.com/v1internal:*` and Google's OAuth flow (`backend/internal/pkg/antigravity/oauth.go` and `client.go`). Its presence in open source does not make it a supported public Google model API. It is not the new official Antigravity SDK. The fork has not configured or verified this adapter, and no credentials have been supplied by this delivery.
 
 Google now documents an [official Antigravity SDK](https://antigravity.google/docs/sdk/overview/) using a Gemini API key, or a Google Cloud project/location and authorized Cloud credentials. The consumer terms separately exclude certain Enterprise arrangements from their scope; that does not automatically approve this retained adapter or subscription-quota reuse. Review the actual product and organizational terms before implementation. An SDK-based agent runtime is a different integration from this gateway's model completion endpoints and is not implemented here.
 
@@ -19,7 +19,7 @@ Choose a documented provider API whose terms permit the intended server-side use
 3. The operator enters the credential directly into the intended secure server-side secret store/admin handoff. Creating credentials or persistent access needs separate action-time approval. Do not copy credentials from the user's installed IDE or browser profile.
 4. Verify the provider's allowed region, data use/retention, exact pricing and rate limits. Do not rotate accounts or retry to evade limits. Respect Retry-After.
 5. On an isolated test instance, authorize a narrowly bounded live test. Check the selected request protocol, model mapping, cancellation, streaming terminal event, error redaction and persisted usage. Confirm provider-side usage and costs too.
-6. Only after that test and a separate deployment decision may an operator enable upstream requests. The existing status `configured_unverified` is an acknowledgement of configuration, never proof of a passed provider check.
+6. Only after that test and a separate deployment decision should an operator route application traffic to the provider. UI visibility alone is not proof of provider readiness.
 
 ## Costs and limits
 
@@ -27,7 +27,7 @@ Choose a documented provider API whose terms permit the intended server-side use
 
 [Gemini API billing](https://ai.google.dev/gemini-api/docs/billing) is separately metered by project/billing account. Free-tier eligibility, paid tiers and available models vary. Do not promise that an AI Pro/Ultra subscription pays for API traffic. [Model pricing](https://ai.google.dev/gemini-api/docs/pricing) and the project's current rate-limit screen are the sources to check immediately before a paid test.
 
-The gateway RPM limiter is not a monetary hard cap. Usage telemetry is eventually consistent; cancellation and retry can leave generation outcomes unknown. Everplain owns the end-user ledger. Never advertise exact billing guarantees based on this gateway's soft operational budgets.
+Use the original upstream quota/billing semantics for the selected standard/simple mode. Cancellation and retry can leave generation outcomes unknown; reconcile provider usage before making billing guarantees.
 
 ## Current acceptance state
 
@@ -42,6 +42,6 @@ Open `/admin/accounts` → Add account → Antigravity → OAuth → Next → Ge
 
 The actual endpoints are `POST /api/v1/admin/antigravity/oauth/auth-url`, then `POST /api/v1/admin/antigravity/oauth/exchange-code`. The latter exchanges the code, reads userinfo, calls LoadCodeAssist, may call OnboardUser, and invokes setUserSettings through the upstream privacy helper. After a successful exchange, the UI automatically creates the account and saves credentials. The refresh-token import is a separate path and also performs external requests. This delivery preserves that behavior and does not introduce a validation-only authorization mode.
 
-`everplain.upstream_enabled: false` blocks public generation routes, but does not block admin OAuth, account tests, scheduled probes, privacy operations or background refresh. Therefore merely withholding a model prompt is not the same as no external requests or no account changes. Using the read-only preview bundle makes no Google requests; its write operations are disabled and it cannot authorize or create an account. An actual gateway instance requires the separate build, PostgreSQL and Redis setup described in DEVELOPMENT.md.
+The removed checkpoint-only `everplain.upstream_enabled` flag is not a control in this full distribution. Admin OAuth, account tests, scheduled probes, privacy operations and background refresh follow upstream behavior. Therefore merely withholding a model prompt is not the same as no external requests or no account changes. Using the read-only preview bundle makes no Google requests; its write operations are disabled and it cannot authorize or create an account. An actual gateway instance requires the separate build, PostgreSQL and Redis setup described in DEVELOPMENT.md.
 
 The operator chooses whether to use a Google/Antigravity account and completes all account steps themselves. No live authorization, token extraction, provider test or privacy change was performed as part of this delivery. Provider terms remain relevant even when no model generation is performed.

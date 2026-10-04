@@ -18,14 +18,14 @@ describe('FeatureFlags.subscription', () => {
     delete (window as any).__APP_CONFIG__
   })
 
-  it('retains the upstream opt-out definition but closes subscriptions in the gateway before settings load', () => {
+  it('reads subscription_enabled as an opt-out flag: visible before settings load', () => {
     expect(FeatureFlags.subscription.key).toBe('subscription_enabled')
     expect(FeatureFlags.subscription.mode).toBe('opt-out')
     expect(useAppStore().cachedPublicSettings).toBeNull()
-    expect(isFeatureFlagEnabled(FeatureFlags.subscription)).toBe(false)
+    expect(isFeatureFlagEnabled(FeatureFlags.subscription)).toBe(true)
   })
 
-  it('keeps subscriptions closed even for stale upstream true settings', () => {
+  it('hides only when the backend explicitly sends false', () => {
     const store = useAppStore()
     const sidebarFlag = makeSidebarFlag(FeatureFlags.subscription)
 
@@ -33,10 +33,10 @@ describe('FeatureFlags.subscription', () => {
     expect(sidebarFlag()).toBe(false)
 
     store.cachedPublicSettings = { subscription_enabled: true } as PublicSettings
-    expect(sidebarFlag()).toBe(false)
+    expect(sidebarFlag()).toBe(true)
 
     store.cachedPublicSettings = {} as PublicSettings
-    expect(sidebarFlag()).toBe(false)
+    expect(sidebarFlag()).toBe(true)
   })
 })
 

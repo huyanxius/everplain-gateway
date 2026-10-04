@@ -8,12 +8,6 @@ import zhCommon from "@/i18n/locales/zh/common";
 import zhSettings from "@/i18n/locales/zh/admin/settings";
 import SettingsView from "../SettingsView.vue";
 
-// Exercise retained upstream settings behavior outside the standalone profile.
-vi.mock("@/config/everplain", async (importOriginal) => ({
-  ...await importOriginal<typeof import("@/config/everplain")>(),
-  EVERPLAIN_GATEWAY_PROFILE: false,
-}));
-
 const {
   getSettings,
   updateSettings,

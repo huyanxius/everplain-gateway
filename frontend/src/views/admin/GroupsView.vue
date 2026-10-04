@@ -1,6 +1,5 @@
 <template>
   <AppLayout>
-    <div class="everplain-notice mb-6" role="note">{{ t('everplain.modelRoutingNote') }}</div>
     <TablePageLayout>
       <template #filters>
         <div

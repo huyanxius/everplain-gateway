@@ -153,3 +153,15 @@ textarea.input { border-radius: var(--qx-radius-field); padding-block: var(--qx-
 .everplain-shell button.settings-tab .settings-tab-icon { background: transparent; color: inherit; }
 
 .everplain-provider a { display: inline-block; margin-top: var(--qx-space-2); color: var(--qx-color-accent); font-size: var(--qx-text-control); line-height: var(--qx-text-control--line-height); text-decoration: underline; }
+
+/* Dark utilities describe foreground roles, not reversed surface palette steps.
+ * A shared gray-100 token is a surface; dark:text-gray-100 must still be ink. */
+:root.dark .everplain-shell :is(.dark\:text-gray-50, .dark\:text-gray-100, .dark\:text-gray-200, .dark\:text-gray-300) { color: var(--qx-color-ink-soft); }
+:root.dark .everplain-shell :is(.dark\:text-gray-400, .dark\:text-gray-500, .dark\:text-gray-600) { color: var(--qx-color-muted); }
+:root .everplain-shell button.select-trigger .select-value { color: var(--qx-color-ink); }
+:root .everplain-shell button.select-trigger .select-value > span { color: inherit; }
+:root .everplain-shell .input::placeholder { color: var(--qx-color-muted); }
+:root .everplain-shell .table-wrapper .table-header,
+:root .everplain-shell .table-wrapper .sticky-header-cell { background-color: var(--qx-color-surface-muted); color: var(--qx-color-muted); }
+:root .everplain-shell .table-wrapper tbody .sticky-col { background-color: var(--qx-color-surface); }
+:root .everplain-shell .table-wrapper tbody tr:hover .sticky-col { background-color: var(--qx-color-surface-muted); }

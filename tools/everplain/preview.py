@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 USER = {'id': 0, 'email': 'preview@example.invalid', 'username': '界面预览',
         'role': 'admin', 'status': 'active', 'balance': 0, 'concurrency': 0,
-        'run_mode': 'simple'}
+        'run_mode': 'standard'}
 STATUS = {'contract_version': '2026-10-04', 'enabled': True,
           'provider': {'state': 'unconfigured', 'verification': 'not_performed',
                        'agy_adapter': 'antigravity_reserved'},
@@ -27,7 +27,8 @@ localStorage.setItem('sub2api_locale','zh');
 localStorage.removeItem('refresh_token');
 localStorage.removeItem('token_expires_at');
 </script>''' % json.dumps(json.dumps(USER, ensure_ascii=False), ensure_ascii=False)
-BANNER = '''<aside id="everplain-preview-banner" role="status" style="position:fixed;bottom:var(--qx-space-4);left:50%%;transform:translateX(-50%%);z-index:99999;width:min(92vw,800px);padding:var(--qx-space-4) var(--qx-space-6);border:1px solid var(--qx-color-rule);border-radius:var(--qx-radius-card);background:var(--qx-color-surface);color:var(--qx-color-ink);box-shadow:var(--qx-shadow-card);font-family:var(--qx-font-ui);font-size:var(--qx-text-control);line-height:var(--qx-text-control--line-height);text-align:center">只读界面预览 · 使用真实 Vue 页面和 Everplain tokens<br>状态为演示配置，未连接账号；用量不可用，操作不会保存。请勿输入任何密钥。</aside>'''.replace('50%%', '50%')
+BANNER = """<style>@media(min-width:1024px){#everplain-preview-banner{margin-left:calc(var(--qx-outline-width) + var(--qx-space-4))!important}}</style><aside id="everplain-preview-banner" role="status" style="position:relative;margin:var(--qx-space-4);padding:var(--qx-space-4) var(--qx-space-6);border:1px solid var(--qx-color-rule);border-radius:var(--qx-radius-card);background:var(--qx-color-surface);color:var(--qx-color-ink);font-family:var(--qx-font-ui);font-size:var(--qx-text-control);line-height:var(--qx-text-control--line-height);text-align:center">只读界面预览 · 使用真实 Vue 页面和 Everplain tokens<br>状态为演示配置，未连接账号；用量不可用，操作不会保存。请勿输入任何密钥。</aside>"""
+
 
 class Preview(SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
@@ -55,8 +56,9 @@ class Preview(SimpleHTTPRequestHandler):
             return self.json_response(200, {'code': 0, 'data': STATUS})
         if path in ('/api/v1/settings/public', '/api/v1/public/settings'):
             return self.json_response(200, {'code': 0, 'data': {
-                'site_name': 'Everplain Gateway', 'registration_enabled': False,
-                'payment_enabled': False, 'subscription_enabled': False,
+                'site_name': 'Everplain Gateway', 'registration_enabled': True,
+                'payment_enabled': True, 'subscription_enabled': True,
+                'affiliate_enabled': True, 'model_plaza_enabled': True,
                 'backend_mode_enabled': False}})
         if path in ('/api/v1/setup/status', '/setup/status'):
             return self.json_response(200, {'code': 0, 'data': {'needs_setup': False}})
@@ -70,7 +72,7 @@ class Preview(SimpleHTTPRequestHandler):
         candidate = Path(self.translate_path(path))
         if not candidate.is_file() or path == '/index.html':
             body = (Path(self.directory) / 'index.html').read_text()
-            body = body.replace('<head>', '<head>' + BOOTSTRAP).replace('</body>', BANNER + '</body>')
+            body = body.replace('<head>', '<head>' + BOOTSTRAP).replace('<div id="app"></div>', BANNER + '<div id="app"></div>')
             data = body.encode()
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')

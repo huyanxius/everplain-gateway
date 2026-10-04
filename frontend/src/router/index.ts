@@ -3,7 +3,6 @@
  * Defines all application routes with lazy loading and navigation guards
  */
 
-import { isGatewayRouteBlocked } from '@/config/everplain'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
@@ -34,7 +33,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/home',
     name: 'Home',
-    redirect: '/login',
+    component: () => import('@/views/HomeView.vue'),
     meta: {
       requiresAuth: false,
       title: 'Home'
@@ -48,6 +47,95 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: false,
       title: 'Login',
       titleKey: 'home.login'
+    }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/auth/RegisterView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Register',
+      titleKey: 'auth.createAccount'
+    }
+  },
+  {
+    path: '/email-verify',
+    name: 'EmailVerify',
+    component: () => import('@/views/auth/EmailVerifyView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Verify Email'
+    }
+  },
+  {
+    path: '/auth/callback',
+    name: 'OAuthCallback',
+    alias: '/auth/oauth/callback',
+    component: () => import('@/views/auth/OAuthCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'OAuth Callback',
+      titleKey: 'auth.oauthCallbackPageTitle'
+    }
+  },
+  {
+    path: '/auth/linuxdo/callback',
+    name: 'LinuxDoOAuthCallback',
+    component: () => import('@/views/auth/LinuxDoCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'LinuxDo OAuth Callback',
+      titleKey: 'auth.linuxdoCallbackPageTitle'
+    }
+  },
+  {
+    path: '/auth/wechat/callback',
+    name: 'WeChatOAuthCallback',
+    component: () => import('@/views/auth/WechatCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'WeChat OAuth Callback',
+      titleKey: 'auth.wechatCallbackPageTitle'
+    }
+  },
+  {
+    path: '/auth/wechat/payment/callback',
+    name: 'WeChatPaymentOAuthCallback',
+    component: () => import('@/views/auth/WechatPaymentCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'WeChat Payment Callback',
+      titleKey: 'auth.wechatPaymentCallbackPageTitle'
+    }
+  },
+  {
+    path: '/auth/dingtalk/callback',
+    name: 'DingTalkOAuthCallback',
+    component: () => import('@/views/auth/DingTalkCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'DingTalk OAuth Callback',
+      titleKey: 'auth.dingtalkCallbackPageTitle'
+    }
+  },
+  {
+    path: '/auth/dingtalk/email-completion',
+    name: 'dingtalk-email-completion',
+    component: () => import('@/views/auth/DingTalkEmailCompletionView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'DingTalk Email Completion'
+    }
+  },
+  {
+    path: '/auth/oidc/callback',
+    name: 'OIDCOAuthCallback',
+    component: () => import('@/views/auth/OidcCallbackView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'OIDC OAuth Callback',
+      titleKey: 'auth.oidcCallbackPageTitle'
     }
   },
   {
@@ -87,6 +175,16 @@ const routes: RouteRecordRaw[] = [
       title: 'Legal Document'
     }
   },
+  {
+    path: '/model-plaza',
+    name: 'ModelPlaza',
+    component: () => import('@/views/ModelPlazaView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Model Plaza',
+      titleKey: 'modelPlaza.title'
+    }
+  },
 
   // ==================== User Routes ====================
   {
@@ -118,6 +216,19 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/batch-image',
+    name: 'BatchImageGuide',
+    alias: '/docs/batch-image',
+    component: () => import('@/views/user/BatchImageGuideView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Batch Image Guide',
+      titleKey: 'batchImageGuide.title',
+      descriptionKey: 'batchImageGuide.description'
+    }
+  },
+  {
     path: '/usage',
     name: 'Usage',
     component: () => import('@/views/user/UsageView.vue'),
@@ -127,6 +238,30 @@ const routes: RouteRecordRaw[] = [
       title: 'Usage Records',
       titleKey: 'usage.title',
       descriptionKey: 'usage.description'
+    }
+  },
+  {
+    path: '/redeem',
+    name: 'Redeem',
+    component: () => import('@/views/user/RedeemView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Redeem Code',
+      titleKey: 'redeem.title',
+      descriptionKey: 'redeem.description'
+    }
+  },
+  {
+    path: '/affiliate',
+    name: 'Affiliate',
+    component: () => import('@/views/user/AffiliateView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Affiliate',
+      titleKey: 'affiliate.title',
+      descriptionKey: 'affiliate.description'
     }
   },
   {
@@ -154,6 +289,103 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/subscriptions',
+    name: 'Subscriptions',
+    component: () => import('@/views/user/SubscriptionsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'My Subscriptions',
+      titleKey: 'userSubscriptions.title',
+      descriptionKey: 'userSubscriptions.description',
+      requiresSubscription: true
+    }
+  },
+  {
+    path: '/purchase',
+    name: 'PurchaseSubscription',
+    component: () => import('@/views/user/PaymentView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Purchase Subscription',
+      titleKey: 'nav.buySubscription',
+      descriptionKey: 'purchase.description',
+      requiresPayment: true
+    }
+  },
+  {
+    path: '/orders',
+    name: 'OrderList',
+    component: () => import('@/views/user/UserOrdersView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'My Orders',
+      titleKey: 'nav.myOrders',
+      requiresPayment: true
+    }
+  },
+  {
+    path: '/payment/qrcode',
+    name: 'PaymentQRCode',
+    component: () => import('@/views/user/PaymentQRCodeView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Payment',
+      titleKey: 'payment.qr.scanToPay',
+      requiresPayment: true
+    }
+  },
+  {
+    path: '/payment/result',
+    name: 'PaymentResult',
+    component: () => import('@/views/user/PaymentResultView.vue'),
+    meta: {
+      requiresAuth: false,
+      requiresAdmin: false,
+      title: 'Payment Result',
+      titleKey: 'payment.result.success',
+      requiresPayment: false
+    }
+  },
+  {
+    path: '/payment/stripe',
+    name: 'StripePayment',
+    component: () => import('@/views/user/StripePaymentView.vue'),
+    meta: {
+      requiresAuth: false,
+      requiresAdmin: false,
+      title: 'Stripe Payment',
+      titleKey: 'payment.stripePay',
+      requiresPayment: false
+    }
+  },
+  {
+    path: '/payment/airwallex',
+    name: 'AirwallexPayment',
+    component: () => import('@/views/user/AirwallexPaymentView.vue'),
+    meta: {
+      requiresAuth: false,
+      requiresAdmin: false,
+      title: 'Airwallex Payment',
+      titleKey: 'payment.airwallexPay',
+      requiresPayment: false
+    }
+  },
+  {
+    path: '/payment/stripe-popup',
+    name: 'StripePopup',
+    component: () => import('@/views/user/StripePopupView.vue'),
+    meta: {
+      requiresAuth: false,
+      requiresAdmin: false,
+      title: 'Payment',
+      requiresPayment: false
+    }
+  },
+  {
     path: '/custom/:id',
     name: 'CustomPage',
     component: () => import('@/views/user/CustomPageView.vue'),
@@ -173,13 +405,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/admin/dashboard',
     name: 'AdminDashboard',
-    component: () => import('@/views/admin/EverplainOverviewView.vue'),
+    component: () => import('@/views/admin/DashboardView.vue'),
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
       title: 'Admin Dashboard',
-      titleKey: 'everplain.overview',
-      descriptionKey: 'everplain.overviewDescription'
+      titleKey: 'admin.dashboard.title',
+      descriptionKey: 'admin.dashboard.description'
     }
   },
   {
@@ -226,8 +458,8 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiresAdmin: true,
       title: 'Group Management',
-      titleKey: 'everplain.modelRouting',
-      descriptionKey: 'everplain.modelRoutingDescription'
+      titleKey: 'admin.groups.title',
+      descriptionKey: 'admin.groups.description'
     }
   },
   {
@@ -270,6 +502,18 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/subscriptions',
+    name: 'AdminSubscriptions',
+    component: () => import('@/views/admin/SubscriptionsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Subscription Management',
+      titleKey: 'admin.subscriptions.title',
+      descriptionKey: 'admin.subscriptions.description'
+    }
+  },
+  {
     path: '/admin/accounts',
     name: 'AdminAccounts',
     component: () => import('@/views/admin/AccountsView.vue'),
@@ -277,8 +521,8 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiresAdmin: true,
       title: 'Account Management',
-      titleKey: 'everplain.upstreamAccounts',
-      descriptionKey: 'everplain.upstreamAccountsDescription'
+      titleKey: 'admin.accounts.title',
+      descriptionKey: 'admin.accounts.description'
     }
   },
   {
@@ -315,6 +559,30 @@ const routes: RouteRecordRaw[] = [
       title: 'Proxy Management',
       titleKey: 'admin.proxies.title',
       descriptionKey: 'admin.proxies.description'
+    }
+  },
+  {
+    path: '/admin/redeem',
+    name: 'AdminRedeem',
+    component: () => import('@/views/admin/RedeemView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Redeem Code Management',
+      titleKey: 'admin.redeem.title',
+      descriptionKey: 'admin.redeem.description'
+    }
+  },
+  {
+    path: '/admin/promo-codes',
+    name: 'AdminPromoCodes',
+    component: () => import('@/views/admin/PromoCodesView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Promo Code Management',
+      titleKey: 'admin.promo.title',
+      descriptionKey: 'admin.promo.description'
     }
   },
   {
@@ -367,8 +635,85 @@ const routes: RouteRecordRaw[] = [
       descriptionKey: 'admin.usage.description'
     }
   },
+  {
+    path: '/admin/affiliates',
+    redirect: '/admin/affiliates/invites'
+  },
+  {
+    path: '/admin/affiliates/invites',
+    name: 'AdminAffiliateInvites',
+    component: () => import('@/views/admin/affiliates/AdminAffiliateInvitesView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Affiliate Invite Records',
+      titleKey: 'nav.affiliateInviteRecords',
+      descriptionKey: 'admin.affiliates.invitesDescription'
+    }
+  },
+  {
+    path: '/admin/affiliates/rebates',
+    name: 'AdminAffiliateRebates',
+    component: () => import('@/views/admin/affiliates/AdminAffiliateRebatesView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Affiliate Rebate Records',
+      titleKey: 'nav.affiliateRebateRecords',
+      descriptionKey: 'admin.affiliates.rebatesDescription'
+    }
+  },
+  {
+    path: '/admin/affiliates/transfers',
+    name: 'AdminAffiliateTransfers',
+    component: () => import('@/views/admin/affiliates/AdminAffiliateTransfersView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Affiliate Transfer Records',
+      titleKey: 'nav.affiliateTransferRecords',
+      descriptionKey: 'admin.affiliates.transfersDescription'
+    }
+  },
 
 
+  // ==================== Payment Admin Routes ====================
+  {
+    path: '/admin/orders/dashboard',
+    name: 'AdminPaymentDashboard',
+    component: () => import('@/views/admin/orders/AdminPaymentDashboardView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Payment Dashboard',
+      titleKey: 'nav.paymentDashboard',
+      requiresPayment: true
+    }
+  },
+  {
+    path: '/admin/orders',
+    name: 'AdminOrders',
+    component: () => import('@/views/admin/orders/AdminOrdersView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Order Management',
+      titleKey: 'nav.orderManagement',
+      requiresPayment: true
+    }
+  },
+  {
+    path: '/admin/orders/plans',
+    name: 'AdminPaymentPlans',
+    component: () => import('@/views/admin/orders/AdminPaymentPlansView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Subscription Plans',
+      titleKey: 'nav.paymentPlans',
+      requiresPayment: true
+    }
+  },
 
   // ==================== 404 Not Found ====================
   {
@@ -439,12 +784,6 @@ router.beforeEach(async (to, _from, next) => {
   navigationLoading.startNavigation()
 
   const authStore = useAuthStore()
-
-  // Close disabled routes before loading any commerce or registration view.
-  if (isGatewayRouteBlocked(to.path)) {
-    next('/login')
-    return
-  }
 
   // Restore auth state from localStorage on first navigation (page refresh)
   if (!authInitialized) {

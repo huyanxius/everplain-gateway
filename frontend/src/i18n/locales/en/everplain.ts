@@ -46,7 +46,7 @@ export default {
     "summary": "Configuration summary",
     "notVerified": "Not verified",
     "modelRoutingNote": "Routing uses upstream groups. Edit a group to set model rules and account selection; account-specific model mapping remains in the account editor.",
-    "accountsNote": "No live account is connected or tested. Full Antigravity OAuth setup contacts Google, may onboard a project, and changes privacy settings. Review the setup notes and decide whether to authorize.",
+    "accountsNote": "Account authorization follows the upstream implementation. Antigravity OAuth contacts Google, may onboard a project, and changes privacy settings. Review the setup notes and choose whether to authorize.",
     "providerTerms": "Read Google Antigravity terms"
   }
 }

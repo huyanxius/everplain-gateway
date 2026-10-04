@@ -1,50 +1,36 @@
-# Build and verify the Everplain fork
+# Build and verify
 
-## Base and resources
+Read upstream DEV_GUIDE.md. Use Go **1.27.0** from backend/go.mod and pnpm with the frozen frontend lockfile. Preserve the original architecture, all upstream capabilities and original standard/simple modes. Do not use production credentials or databases for local checks.
 
-Read the upstream `DEV_GUIDE.md`. Its Go requirement is **1.27.0**, frontend package manager is **pnpm**, and the lockfile must remain frozen unless intentionally updated. Keep all development in a separate worktree and do not use a production database, provider account, or paid model API for tests.
-
-The official Go 1.27.0 linux/amd64 archive was verified against the official go.dev release SHA256 `675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685`. This is a development toolchain, not an uploaded repository artifact.
-
-## Build a single embedded server
+## Production asset build
 
 ```sh
 pnpm --dir frontend install --frozen-lockfile
-pnpm --dir frontend run build
+pnpm --dir frontend typecheck
+pnpm --dir frontend test:run --maxWorkers=1 --minWorkers=1 --no-file-parallelism
+pnpm --dir frontend build
 cd backend
-GOMAXPROCS=1 GOGC=20 GOMEMLIMIT=768MiB go build -p 1 -tags embed -trimpath -ldflags="-s -w" -o bin/everplain-gateway ./cmd/server
+go build -tags embed -trimpath -ldflags="-s -w" -o bin/everplain-gateway ./cmd/server
 ```
 
-Vite writes its production assets to the existing `backend/internal/web/dist`; `-tags embed` places those assets inside the Go binary. No separate frontend runtime or new microservice is required. The upstream root `make build` compiles the backend before frontend and does not set `-tags embed`, so use the command order above or `make -f deploy/everplain/Makefile build` for this fork.
+The frontend build outputs to backend/internal/web/dist. Use `pnpm --dir frontend exec vite build --config vite.config.ts --outDir dist` only for a standalone frontend artifact after type/i18n checks. This does not replace the full build checks.
 
-The lower compile parallelism and GC limit are for resource-constrained development hosts. The initial uncapped Ent package compile was killed by memory pressure; this does not establish the running gateway's RAM requirement. Do not confuse compiler memory with idle service memory.
+For a memory-constrained build host, serialize processes and use bounded compiler parallelism (`GOMAXPROCS=1`, `go build -p 1`). These are build-time choices, not a feature-limited runtime mode or a production resource promise.
 
-## Tests
+## Backend tests
 
-```sh
-cd backend
-go test ./internal/everplain ./internal/config
-go test -tags unit ./internal/handler ./internal/server/... -run 'Everplain|SimpleMode|GroupModelAllowlist|ClientRequestID'
-go test -tags unit ./internal/service -run 'SimpleModeRecordUsageWindowOptIn|OpenAIGatewayServiceRecordUsage_SimpleMode|ReserveInflightBalance_SimpleMode'
-go test -tags unit ./...
-go test -tags integration ./...
-golangci-lint run ./...
-```
+Run upstream `make test-unit`, `make test-integration`, and golangci-lint under backend. The only current backend source difference is a setup DSN fix that reuses the existing database DSN builder to avoid treating an empty password as the next configuration keyword. It has focused regression coverage.
 
-Focused boundary tests use local fake handlers and miniredis. They do not contact model providers. Full upstream unit/integration/lint checks have their own dependency requirements; see the checked verification report for which stages actually ran. Never treat a focused pass as the full suite.
+## Local runtime
 
-## Isolated local runtime
+Use upstream deploy/config.example.yaml and deployment documentation for a fresh isolated PostgreSQL database, Redis and administrator setup. Keep services bound to loopback for local development. No real provider/account secret is provided. Do not connect the disposable development database to production.
 
-Use `deploy/everplain/config.example.yaml` as the lightweight starting profile. A fresh test instance needs a private `DATA_DIR`, its own PostgreSQL database, and its own Redis instance, all bound to loopback. Supply local-only database/Redis parameters through environment variables. `CONFIG_FILE` selects the example or a private copy. `AUTO_SETUP=true` plus local-only administrator settings can initialize an empty isolated database. Do not put actual secrets into committed YAML or shell examples.
+## Read-only UI preview
 
-Production deployment is deliberately out of scope. Before deployment, use TLS, authorized provider credentials, tested model mappings, a dedicated Everplain service key, backups, log/usage retention, and separately validated performance/security/recovery tests. The source tree preserves upstream distribution and release workflows; do not trigger a tag release without reviewing fork targets, names, signing, licensing and deployment intent.
+A separate downloadable preview bundle includes compiled Vue assets and tools/everplain/preview.py. It needs only Python 3, runs on loopback, marks all configuration as demonstrative, makes no Google/provider requests, returns unavailable usage, and rejects writes. It is not a runnable provider gateway and cannot complete OAuth. See tools/everplain/PREVIEW.md.
 
-## Synthetic provider fixture
+## Verification boundaries
 
-`tools/everplain/seed-local-test.sql` refuses to run outside the explicitly disposable `everplain_gateway_test` database. It creates only a synthetic service user/key and one localhost Anthropic adapter with an `everplain-test` model mapping. Supply the psql variables `service_key` and `upstream_key` from private, newly generated runtime values. No authentication value is committed. Set `EVERPLAIN_TEST_SERVICE_KEY` only in the isolated test process when invoking the smoke script.
+Historical frontend checkpoint: 341 files / 2647 tests, typecheck, build and changed-file lint passed. Historical synthetic text-only load tests do not establish the resource use of this full-feature version. Cloud memory pressure has interrupted newer full build/type/suite attempts. Report final-head checks separately and do not merge on an invented pass.
 
-The mock supports `--tls-cert <temporary-cert> --tls-key <temporary-key>` and binds only `127.0.0.1:18082`. Use a short-lived test certificate with an IP SAN for `127.0.0.1`, set `SSL_CERT_FILE` for the isolated gateway process only, and give that process a private config with the URL allowlist enabled, upstream hosts limited to `127.0.0.1`, and private hosts permitted. Do not change the system CA store or disable certificate verification. When the allowlist is enabled upstream enforces HTTPS regardless of `allow_insecure_http`.
-
-Initialize the isolated gateway at `127.0.0.1:18081`, apply the fixture, and restart it so the existing scheduler sees the account. Run `python tools/everplain/smoke-local.py` while upstream is disabled. Then explicitly enable the synthetic adapter in that isolated process and run `python tools/everplain/smoke-local.py --configured`. These scripts never contact an external model service. The mock injects a fixed 25 ms delay and emits 10 input/5 output tokens; synthetic latency is not a model-provider SLO.
-
-Stop the gateway, mock, PostgreSQL and Redis processes after validation. Do not reuse test keys, certificates or databases in a deployment.
+A real Mac browser preview of the earlier bundle revealed dark-foreground, hardcoded table-header and overlay-banner issues. Source fixes use canonical tokens; a fresh build and browser review are required to accept the new full-feature bundle. No production deployment or real model call is authorized by these checks.

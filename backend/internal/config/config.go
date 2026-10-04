@@ -66,7 +66,6 @@ const DefaultUpstreamResponseReadMaxBytes int64 = 128 * 1024 * 1024
 const DefaultModelsListReadMaxBytes int64 = 8 * 1024 * 1024
 
 type Config struct {
-	Everplain               EverplainConfig               `mapstructure:"everplain"`
 	Server                  ServerConfig                  `mapstructure:"server"`
 	Log                     LogConfig                     `mapstructure:"log"`
 	CORS                    CORSConfig                    `mapstructure:"cors"`
@@ -2033,11 +2032,7 @@ func configureConfigSource(setConfigFile, addConfigPath func(string)) {
 }
 
 func setDefaults() {
-	viper.SetDefault("run_mode", RunModeSimple)
-	viper.SetDefault("everplain.enabled", true)
-	viper.SetDefault("everplain.upstream_enabled", false)
-	viper.SetDefault("everplain.requests_per_minute", 60)
-	viper.SetDefault("everplain.request_timeout_seconds", 120)
+	viper.SetDefault("run_mode", RunModeStandard)
 	viper.SetDefault("simple_mode.auto_create_default_groups", true)
 	viper.SetDefault("simple_mode_key_rate_limit_enabled", false)
 
@@ -2708,9 +2703,6 @@ func setEnvReachableDefaults() {
 }
 
 func (c *Config) Validate() error {
-	if err := c.Everplain.Validate(c.RunMode); err != nil {
-		return err
-	}
 	forwardedClientIPHeaders, err := NormalizeForwardedClientIPHeaders(c.Security.ForwardedClientIPHeaders)
 	if err != nil {
 		return fmt.Errorf("security.forwarded_client_ip_headers: %w", err)

@@ -1,4 +1,3 @@
-import { applyGatewayPublicSettings } from '@/config/everplain'
 /**
  * Authentication API endpoints
  * Handles user login, registration, and logout operations
@@ -353,7 +352,7 @@ export function isAuthenticated(): boolean {
  */
 export async function getPublicSettings(): Promise<PublicSettings> {
   const { data } = await apiClient.get<PublicSettings>('/settings/public')
-  return applyGatewayPublicSettings(data)
+  return data
 }
 
 export type WeChatOAuthMode = 'open' | 'mp'

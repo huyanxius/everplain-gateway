@@ -60,7 +60,7 @@
 
         <!-- Balance Display -->
         <div
-          v-if="user && !EVERPLAIN_GATEWAY_PROFILE"
+          v-if="user"
           class="group relative hidden items-center gap-2 rounded-xl bg-primary-50 px-3 py-1.5 dark:bg-primary-900/20 sm:flex"
         >
           <svg
@@ -254,7 +254,6 @@
 </template>
 
 <script setup lang="ts">
-import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -294,7 +293,7 @@ const balanceFrozenLabel = computed(() => `${balanceFrozenText.value} ${formatHe
 
 // 只在标准模式的管理员下显示新手引导按钮
 const showOnboardingButton = computed(() => {
-  return !EVERPLAIN_GATEWAY_PROFILE && !authStore.isSimpleMode && user.value?.role === 'admin'
+  return !authStore.isSimpleMode && user.value?.role === 'admin'
 })
 
 const userInitials = computed(() => {

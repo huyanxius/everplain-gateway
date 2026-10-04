@@ -1,7 +1,6 @@
 <template>
   <AppLayout>
     <div class="mx-auto max-w-6xl space-y-6">
-      <div class="everplain-notice" role="note">{{ t('everplain.settingsNotice') }}</div>
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <div
@@ -8976,7 +8975,6 @@
 </template>
 
 <script setup lang="ts">
-import { EVERPLAIN_GATEWAY_PROFILE } from "@/config/everplain";
 import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { adminAPI } from "@/api";
@@ -9109,7 +9107,7 @@ const settingsTabs = [
   { key: "security" as SettingsTab, icon: "shield" as const },
   { key: "users" as SettingsTab, icon: "user" as const },
   { key: "gateway" as SettingsTab, icon: "server" as const },
-  ...(!EVERPLAIN_GATEWAY_PROFILE ? [{ key: "payment" as SettingsTab, icon: "creditCard" as const }] : []),
+  { key: "payment" as SettingsTab, icon: "creditCard" as const },
   { key: "email" as SettingsTab, icon: "mail" as const },
   { key: "backup" as SettingsTab, icon: "database" as const },
 ];
@@ -12913,7 +12911,7 @@ async function handleDeleteProvider() {
 
 onMounted(() => {
   loadSettings();
-  if (!EVERPLAIN_GATEWAY_PROFILE) loadSubscriptionGroups();
+  loadSubscriptionGroups();
   loadAdminApiKey();
   loadUpstreamBillingProbeSettings();
   loadOllamaCloudUsageSettings();
@@ -12924,7 +12922,7 @@ onMounted(() => {
   loadStreamTimeoutSettings();
   loadRectifierSettings();
   loadBetaPolicySettings();
-  if (!EVERPLAIN_GATEWAY_PROFILE) loadProviders();
+  loadProviders();
 });
 
 // =========================

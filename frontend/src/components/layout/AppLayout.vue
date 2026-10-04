@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import '@/styles/onboarding.css'
 import { useI18n } from 'vue-i18n'
-import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
 import { computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth'
@@ -43,7 +42,7 @@ const isAdmin = computed(() => authStore.user?.role === 'admin')
 
 const { replayTour } = useOnboardingTour({
   storageKey: isAdmin.value ? 'admin_guide' : 'user_guide',
-  autoStart: !EVERPLAIN_GATEWAY_PROFILE
+  autoStart: true
 })
 
 const onboardingStore = useOnboardingStore()

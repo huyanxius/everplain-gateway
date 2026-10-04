@@ -17,3 +17,7 @@ If distributing an executable/container, preserve notices and make the correspon
 ## Fork differences
 
 See `docs/everplain/CONTRACT.md` and `docs/everplain/DEVELOPMENT.md`. Fork additions are deliberately small boundary/configuration changes; upstream architecture and migrations are not rewritten. UI adaptations stay in the existing frontend and are embedded into the same backend binary.
+
+## Current feature-preservation scope
+
+The earlier Everplain text-only/light profile has been removed at the operator's request. The full upstream route registry, admin/user menus, payment/registration and provider protocol handlers are preserved. In particular VersionBadge's version details, update and rollback actions remain accessible. Invoking upstream binary self-update can replace this fork with an upstream build; review the target before using it. This is a warning, not a disabled feature, and no update or rollback was performed.

@@ -46,7 +46,7 @@ export default {
     "summary": "配置摘要",
     "notVerified": "未验证",
     "modelRoutingNote": "路由沿用上游分组机制。编辑分组可设置模型规则与账号选择；账号级模型映射仍在账号编辑器中。",
-    "accountsNote": "此构建未接入或测试真实账号。Antigravity OAuth 完整流程会访问 Google、可能初始化项目并修改隐私设置；请先阅读接入说明，自行决定是否授权。",
+    "accountsNote": "上游账号与授权沿用原实现。Antigravity OAuth 会访问 Google、可能初始化项目并修改隐私设置；请阅读接入说明，自行决定是否授权。",
     "providerTerms": "查看 Google Antigravity 条款"
   }
 }

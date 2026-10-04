@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
-	"github.com/Wei-Shaw/sub2api/internal/everplain"
 	"github.com/Wei-Shaw/sub2api/internal/handler"
 	middleware2 "github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/server/routes"
@@ -71,11 +70,6 @@ func SetupRouter(
 	}))
 	r.Use(middleware2.ServerTiming(cfg.Server.EnableServerTiming))
 
-	// Enforce the fork profile before the SPA fallback and any registered API.
-	r.Use(middleware2.ClientRequestID())
-	r.Use(everplain.NormalizeErrors(cfg.Everplain.Enabled))
-	r.Use(everplain.ProfileGuard(cfg.Everplain.Enabled))
-
 	// Serve embedded frontend with settings injection if available
 	if web.HasEmbeddedFrontend() {
 		frontendServer, err := web.NewFrontendServer(settingService) //nolint:staticcheck // SA4023: the !embed stub always errors; embed builds can return nil
@@ -134,20 +128,7 @@ func registerRoutes(
 	routes.RegisterUserRoutes(v1, h, jwtAuth, auditLog, settingService, panelRateLimiter)
 	routes.RegisterModelPlazaRoutes(v1, h, optionalJWTAuth, settingService, panelRateLimiter)
 	routes.RegisterAdminRoutes(v1, h, adminAuth, auditLog, stepUpAuth, settingService, panelRateLimiter)
-	var gatewayGuards []gin.HandlerFunc
-	if cfg.Everplain.Enabled {
-		gatewayGuards = append(gatewayGuards, everplain.RateLimit(redisClient, cfg.Everplain.RequestsPerMinute, func(c *gin.Context) int64 {
-			key, ok := middleware2.GetAPIKeyFromContext(c)
-			if !ok {
-				return 0
-			}
-			return key.ID
-		}), everplain.GenerationGuard(cfg.Everplain.UpstreamEnabled, time.Duration(cfg.Everplain.RequestTimeoutSeconds)*time.Second))
-	}
-	routes.RegisterGatewayRoutes(r, h, apiKeyAuth, apiKeyService, subscriptionService, opsService, settingService, compositeResolver, cfg, gatewayGuards...)
-	v1.GET("/admin/everplain/status", gin.HandlerFunc(adminAuth), func(c *gin.Context) {
-		c.JSON(200, gin.H{"code": 0, "data": everplain.Status(cfg.Everplain.Enabled, cfg.Everplain.UpstreamEnabled, cfg.Everplain.RequestsPerMinute, cfg.Everplain.RequestTimeoutSeconds)})
-	})
+	routes.RegisterGatewayRoutes(r, h, apiKeyAuth, apiKeyService, subscriptionService, opsService, settingService, compositeResolver, cfg)
 	routes.RegisterPaymentRoutes(v1, h.Payment, h.PaymentWebhook, h.Admin.Payment, jwtAuth, adminAuth, auditLog, settingService, panelRateLimiter, redisClient)
 
 	handler.RegisterPageRoutes(v1, cfg.Pricing.DataDir, gin.HandlerFunc(jwtAuth), gin.HandlerFunc(adminAuth), settingService)

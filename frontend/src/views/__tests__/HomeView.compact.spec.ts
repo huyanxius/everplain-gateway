@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 
-// The upstream landing page is retained in source; gateway /home redirects to login.
-vi.mock('@/config/everplain', () => ({ GATEWAY_DISABLED_FEATURES: new Set() }))
-
 import HomeView from '../HomeView.vue'
 
 const { appStore, authStore } = vi.hoisted(() => ({

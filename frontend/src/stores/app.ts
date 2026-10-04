@@ -3,7 +3,7 @@
  * Manages global UI state including sidebar, loading indicators, and toast notifications
  */
 
-import { EVERPLAIN_SITE_NAME, applyGatewayPublicSettings } from '@/config/everplain'
+import { EVERPLAIN_SITE_NAME } from '@/config/everplain'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Toast, ToastType, PublicSettings } from '@/types'
@@ -291,7 +291,6 @@ export const useAppStore = defineStore('app', () => {
    * Apply settings to store state (internal helper to avoid code duplication)
    */
   function applySettings(config: PublicSettings): PublicSettings {
-    config = applyGatewayPublicSettings(config)
     if (typeof window !== 'undefined') {
       window.__APP_CONFIG__ = { ...config }
     }
