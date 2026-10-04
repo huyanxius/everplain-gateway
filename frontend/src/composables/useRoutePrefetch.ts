@@ -7,6 +7,7 @@
  * - 通过路由配置动态获取组件的 import 函数
  * - 只在实际需要预加载时才执行
  */
+import { isGatewayRouteBlocked } from '@/config/everplain'
 import { ref, readonly } from 'vue'
 import type { RouteLocationNormalized, Router } from 'vue-router'
 
@@ -97,7 +98,7 @@ export function useRoutePrefetch(router?: Router) {
    * 获取当前路由应该预加载的路由路径列表
    */
   const getPrefetchPaths = (route: RouteLocationNormalized): string[] => {
-    return PREFETCH_ADJACENCY[route.path] || []
+    return (PREFETCH_ADJACENCY[route.path] || []).filter(path => !isGatewayRouteBlocked(path))
   }
 
   /**

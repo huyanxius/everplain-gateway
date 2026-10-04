@@ -1,5 +1,9 @@
 <template>
   <aside
+    id="gateway-sidebar"
+    ref="sidebarRef"
+    :inert="isMobileViewport && !mobileOpen"
+    :aria-hidden="isMobileViewport && !mobileOpen ? true : undefined"
     class="sidebar"
     :class="[
       sidebarCollapsed ? 'w-[72px]' : 'w-64',
@@ -14,7 +18,8 @@
         class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl shadow-glow transition-opacity hover:opacity-80"
         @click="handleMenuItemClick(homePath)"
       >
-        <img v-if="settingsLoaded" :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
+        <EverplainMark v-if="EVERPLAIN_GATEWAY_PROFILE && !siteLogo" class="h-full w-full" />
+        <img v-else-if="settingsLoaded" :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
       </router-link>
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
         <router-link
@@ -25,12 +30,13 @@
           {{ siteName }}
         </router-link>
         <!-- Version Badge -->
-        <VersionBadge :version="siteVersion" />
+        <span v-if="EVERPLAIN_GATEWAY_PROFILE" class="everplain-brand-caption">Gateway</span>
+        <VersionBadge v-else :version="siteVersion" />
       </div>
     </div>
 
     <!-- Navigation -->
-    <nav ref="sidebarNavRef" class="sidebar-nav scrollbar-hide">
+    <nav ref="sidebarNavRef" class="sidebar-nav scrollbar-hide" :aria-label="t('everplain.navigation')">
       <!-- Admin View: Admin menu first, then personal menu -->
       <template v-if="isAdmin">
         <!-- Admin Section -->
@@ -46,6 +52,7 @@
                   'sidebar-link-collapsed': sidebarCollapsed
                 }"
                 :title="sidebarCollapsed ? item.label : undefined"
+              :aria-label="item.label"
                 @click="handleGroupClick(item)"
               >
                 <component :is="item.icon" class="h-5 w-5 flex-shrink-0" />
@@ -83,6 +90,7 @@
               class="sidebar-link mb-1"
               :class="{ 'sidebar-link-active': isActive(item.path), 'sidebar-link-collapsed': sidebarCollapsed }"
               :title="sidebarCollapsed ? item.label : undefined"
+              :aria-label="item.label"
               :id="
                 item.path === '/admin/accounts'
                   ? 'sidebar-channel-manage'
@@ -102,7 +110,7 @@
         </div>
 
         <!-- Personal Section for Admin (hidden in simple mode) -->
-        <div v-if="!authStore.isSimpleMode" class="sidebar-section">
+        <div v-if="!EVERPLAIN_GATEWAY_PROFILE && !authStore.isSimpleMode" class="sidebar-section">
           <div class="sidebar-section-title" :class="{ 'sidebar-section-title-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
             <span class="sidebar-section-title-text" :class="{ 'sidebar-section-title-text-collapsed': sidebarCollapsed }">
               {{ t('nav.myAccount') }}
@@ -116,6 +124,7 @@
             class="sidebar-link mb-1"
             :class="{ 'sidebar-link-active': isActive(item.path), 'sidebar-link-collapsed': sidebarCollapsed }"
             :title="sidebarCollapsed ? item.label : undefined"
+              :aria-label="item.label"
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
@@ -136,6 +145,7 @@
             class="sidebar-link mb-1"
             :class="{ 'sidebar-link-active': isActive(item.path), 'sidebar-link-collapsed': sidebarCollapsed }"
             :title="sidebarCollapsed ? item.label : undefined"
+              :aria-label="item.label"
             :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
             @click="handleMenuItemClick(item.path)"
           >
@@ -155,6 +165,7 @@
         class="sidebar-link mb-2 w-full"
         :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
         :title="sidebarCollapsed ? (isDark ? t('nav.lightMode') : t('nav.darkMode')) : undefined"
+        :aria-label="isDark ? t('nav.lightMode') : t('nav.darkMode')"
       >
         <SunIcon v-if="isDark" class="h-5 w-5 flex-shrink-0 text-amber-500" />
         <MoonIcon v-else class="h-5 w-5 flex-shrink-0" />
@@ -169,6 +180,7 @@
         class="sidebar-link w-full"
         :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
         :title="sidebarCollapsed ? t('nav.expand') : t('nav.collapse')"
+        :aria-label="sidebarCollapsed ? t('nav.expand') : t('nav.collapse')"
       >
         <ChevronDoubleLeftIcon v-if="!sidebarCollapsed" class="h-5 w-5 flex-shrink-0" />
         <ChevronDoubleRightIcon v-else class="h-5 w-5 flex-shrink-0" />
@@ -188,10 +200,13 @@
 </template>
 
 <script setup lang="ts">
+import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
+import { useMediaQuery } from '@vueuse/core'
 import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAdminSettingsStore, useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
+import EverplainMark from '@/components/common/EverplainMark.vue'
 import VersionBadge from '@/components/common/VersionBadge.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { sanitizeSvg } from '@/utils/sanitize'
@@ -246,7 +261,9 @@ const onboardingStore = useOnboardingStore()
 const adminSettingsStore = useAdminSettingsStore()
 const { canUseBatchImage, refreshBatchImageAccess } = useBatchImageAccess()
 
-const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
+const isMobileViewport = useMediaQuery('(max-width: 1023px)')
+const sidebarRef = ref<HTMLElement | null>(null)
+const sidebarCollapsed = computed(() => appStore.sidebarCollapsed && !appStore.mobileOpen)
 const mobileOpen = computed(() => appStore.mobileOpen)
 const isAdmin = computed(() => authStore.isAdmin)
 const sidebarNavRef = ref<HTMLElement | null>(null)
@@ -261,7 +278,7 @@ const homePath = computed(() => (isAdmin.value ? '/admin/dashboard' : '/dashboar
 const groupExpandOverrides = ref<Map<string, boolean>>(new Map())
 
 // Site settings from appStore (cached, no flicker)
-const siteName = computed(() => appStore.siteName)
+const siteName = computed(() => EVERPLAIN_GATEWAY_PROFILE && appStore.siteName === 'Everplain Gateway' ? 'Everplain' : appStore.siteName)
 const siteLogo = computed(() => sanitizeUrl(appStore.siteLogo || '', { allowRelative: true, allowDataUrl: true }))
 const siteVersion = computed(() => appStore.siteVersion)
 const settingsLoaded = computed(() => appStore.publicSettingsLoaded)
@@ -718,6 +735,12 @@ const flagBatchImageAccess = () => canUseBatchImage.value
 // 条目顺序：密钥 → 用量 → 可用渠道 → 渠道状态 → 订阅/支付 → 兑换/资料。
 // 可用渠道紧挨渠道状态之上，让用户"先看自己能用什么、再看对应状态"。
 function buildSelfNavItems(withDashboard: boolean): NavItem[] {
+  if (EVERPLAIN_GATEWAY_PROFILE) return [
+    ...(withDashboard ? [{ path: '/dashboard', label: t('everplain.overview'), icon: DashboardIcon }] : []),
+    { path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon },
+    { path: '/usage', label: t('nav.usage'), icon: ChartIcon },
+    { path: '/profile', label: t('nav.profile'), icon: UserIcon },
+  ]
   const items: NavItem[] = []
   if (withDashboard) {
     items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: DashboardIcon })
@@ -774,6 +797,14 @@ const customMenuItemsForAdmin = computed(() => {
 
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
+  if (EVERPLAIN_GATEWAY_PROFILE) return [
+    { path: '/admin/dashboard', label: t('everplain.overview'), icon: DashboardIcon },
+    { path: '/admin/accounts', label: t('everplain.upstreamAccounts'), icon: GlobeIcon },
+    { path: '/admin/groups', label: t('everplain.modelRouting'), icon: FolderIcon },
+    { path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon },
+    { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon },
+    { path: '/admin/settings', label: t('nav.settings'), icon: CogIcon },
+  ]
   const baseItems: NavItem[] = [
     { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon },
     { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring },
@@ -869,6 +900,27 @@ function toggleTheme() {
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
 }
 
+let previousFocus: HTMLElement | null = null
+watch(mobileOpen, async (open) => {
+  if (open) {
+    previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    await nextTick()
+    sidebarRef.value?.querySelector<HTMLElement>('a, button')?.focus()
+  } else {
+    previousFocus?.focus()
+  }
+})
+function handleMobileKeyboard(event: KeyboardEvent) {
+  if (!mobileOpen.value || !isMobileViewport.value) return
+  if (event.key === 'Escape') { event.preventDefault(); closeMobile(); return }
+  if (event.key !== 'Tab') return
+  const focusable = Array.from(sidebarRef.value?.querySelectorAll<HTMLElement>('a[href], button:not(:disabled)') ?? [])
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+}
+
 function closeMobile() {
   appStore.setMobileOpen(false)
 }
@@ -954,7 +1006,8 @@ watch(
 )
 
 onMounted(() => {
-  void refreshBatchImageAccess()
+  document.addEventListener('keydown', handleMobileKeyboard)
+  if (!EVERPLAIN_GATEWAY_PROFILE) void refreshBatchImageAccess()
   if (isAdmin.value) {
     adminSettingsStore.fetch()
   }
@@ -969,6 +1022,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleMobileKeyboard)
   if (sidebarNavRef.value) {
     appStore.sidebarScrollTop = sidebarNavRef.value.scrollTop
   }

@@ -1,0 +1,13 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" aria-hidden="true" class="everplain-brand-mark">
+  <path fill="currentColor" d="M9.2 8.2 19 9.1c.8.1 1.3.8 1.1 1.6l-1.4 6.7c-.2.8-.8 1.3-1.6 1.2l-8.7-.7c-.8-.1-1.3-.7-1.2-1.5l.6-6.9c.1-.8.6-1.3 1.4-1.3Z"/>
+  <path fill="currentColor" d="m22.6 5.5 8.3 2.2c.6.2 1 .7 1.1 1.3l1.2 10.2c.1.8-.4 1.4-1.1 1.6l-10.5.4c-.7.2-1.4-.3-1.6-1l-1-1.3c-.1-.3-.1-.6 0-.9l2-11.5c.2-.7.9-1.2 1.6-1Z"/>
+  <path fill="currentColor" d="m7.4 20.2 9.3-.5c.7 0 1.3.4 1.5 1.1l1.6 8.9c.2.7-.2 1.3-.8 1.6L8.9 35c-.9.3-1.7-.3-1.8-1.2L6.2 21.7c-.1-.8.4-1.4 1.2-1.5Z"/>
+  <path fill="currentColor" d="m21.3 22.3 7.7.3c.4 0 .8.2 1 .6l4.6 7.5c.5.8 0 1.8-.9 2l-10.5 2.2c-.7.1-1.4-.3-1.6-1l-2.4-9.8c-.2-1 .8-1.9 2.1-1.8Z"/>
+  </svg>
+</template>
+
+<!-- Original Everplain Web brand geometry, preserved from the verified Web asset. -->
+<style scoped>
+.everplain-brand-mark { color: var(--qx-color-ink); }
+</style>

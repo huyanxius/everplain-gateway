@@ -28,6 +28,7 @@ func RegisterGatewayRoutes(
 	settingService *service.SettingService,
 	compositeResolver *service.CompositeRouteResolver,
 	cfg *config.Config,
+	everplainGuards ...gin.HandlerFunc,
 ) {
 	bodyLimit := middleware.RequestBodyLimit(cfg.Gateway.MaxBodySize)
 	textBodyLimit := middleware.RequestBodyLimit(cfg.Gateway.TextMaxBodySize)
@@ -189,6 +190,12 @@ func RegisterGatewayRoutes(
 	gateway.Use(opsErrorLogger)
 	gateway.Use(endpointNorm)
 	gateway.Use(gin.HandlerFunc(apiKeyAuth))
+	if len(everplainGuards) > 0 {
+		gateway.Use(everplainGuards...)
+	}
+	if cfg.Everplain.Enabled {
+		gateway.GET("/everplain/usage", h.Gateway.EverplainUsage)
+	}
 	gateway.GET("/sub2api/billing", h.Gateway.KeyBillingInfo)
 	gateway.Use(groupModelAllowlist)
 	gateway.Use(compositeTarget)

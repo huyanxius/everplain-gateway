@@ -1,5 +1,5 @@
 <template>
-  <header class="glass sticky top-0 z-30 border-b border-gray-200/50 dark:border-dark-700/50">
+  <header class="everplain-header glass sticky top-0 z-30 border-b border-gray-200/50 dark:border-dark-700/50">
     <div class="flex h-16 items-center justify-between gap-2 px-2 sm:px-4 md:px-6">
       <!-- Left: Mobile Menu Toggle + Page Title -->
       <div class="flex shrink-0 items-center gap-2 sm:gap-4">
@@ -7,15 +7,17 @@
           @click="toggleMobileSidebar"
           class="btn-ghost btn-icon lg:hidden"
           :aria-label="t('common.toggleMenu')"
+          aria-controls="gateway-sidebar"
+          :aria-expanded="appStore.mobileOpen"
         >
           <Icon name="menu" size="md" />
         </button>
 
-        <div class="hidden lg:block">
-          <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <div class="min-w-0">
+          <h1 class="everplain-page-title text-lg font-semibold text-gray-900 dark:text-white">
             {{ pageTitle }}
           </h1>
-          <p v-if="pageDescription" class="text-xs text-gray-500 dark:text-dark-400">
+          <p v-if="pageDescription" class="hidden sm:block text-xs text-gray-500 dark:text-dark-400">
             {{ pageDescription }}
           </p>
         </div>
@@ -58,7 +60,7 @@
 
         <!-- Balance Display -->
         <div
-          v-if="user"
+          v-if="user && !EVERPLAIN_GATEWAY_PROFILE"
           class="group relative hidden items-center gap-2 rounded-xl bg-primary-50 px-3 py-1.5 dark:bg-primary-900/20 sm:flex"
         >
           <svg
@@ -252,6 +254,7 @@
 </template>
 
 <script setup lang="ts">
+import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -291,7 +294,7 @@ const balanceFrozenLabel = computed(() => `${balanceFrozenText.value} ${formatHe
 
 // 只在标准模式的管理员下显示新手引导按钮
 const showOnboardingButton = computed(() => {
-  return !authStore.isSimpleMode && user.value?.role === 'admin'
+  return !EVERPLAIN_GATEWAY_PROFILE && !authStore.isSimpleMode && user.value?.role === 'admin'
 })
 
 const userInitials = computed(() => {

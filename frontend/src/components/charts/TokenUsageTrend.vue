@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEverplainChartTheme } from "@/composables/useEverplainChartTheme"
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -54,18 +55,15 @@ const props = defineProps<{
   loading?: boolean
 }>()
 
-const isDarkMode = computed(() => {
-  return document.documentElement.classList.contains('dark')
-})
-
+const everplainTheme = useEverplainChartTheme()
 const chartColors = computed(() => ({
-  text: isDarkMode.value ? '#e5e7eb' : '#374151',
-  grid: isDarkMode.value ? '#374151' : '#e5e7eb',
-  input: '#3b82f6',
-  output: '#10b981',
-  cacheCreation: '#f59e0b',
-  cacheRead: '#06b6d4',
-  cacheHitRate: '#8b5cf6'
+  text: everplainTheme.value.text,
+  grid: everplainTheme.value.grid,
+  input: everplainTheme.value.series[0],
+  output: everplainTheme.value.series[1],
+  cacheCreation: everplainTheme.value.series[2],
+  cacheRead: everplainTheme.value.series[5],
+  cacheHitRate: everplainTheme.value.series[4],
 }))
 
 const chartData = computed(() => {
@@ -139,7 +137,7 @@ const lineOptions = computed(() => ({
         pointStyle: 'circle',
         padding: 15,
         font: {
-          size: 11
+          size: 13
         }
       }
     },
@@ -170,7 +168,7 @@ const lineOptions = computed(() => ({
       ticks: {
         color: chartColors.value.text,
         font: {
-          size: 10
+          size: 13
         }
       }
     },
@@ -181,7 +179,7 @@ const lineOptions = computed(() => ({
       ticks: {
         color: chartColors.value.text,
         font: {
-          size: 10
+          size: 13
         },
         callback: (value: string | number) => formatTokens(Number(value))
       }
@@ -196,7 +194,7 @@ const lineOptions = computed(() => ({
       ticks: {
         color: chartColors.value.cacheHitRate,
         font: {
-          size: 10
+          size: 13
         },
         callback: (value: string | number) => `${value}%`
       }

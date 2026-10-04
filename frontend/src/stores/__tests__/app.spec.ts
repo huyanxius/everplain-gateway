@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAppStore } from '@/stores/app'
 import { getPublicSettings } from '@/api/auth'
+import { applyGatewayPublicSettings } from '@/config/everplain'
 import type { PublicSettings } from '@/types'
 
 function createDeferred<T>() {
@@ -348,12 +349,12 @@ describe('useAppStore', () => {
 
       deferred.resolve(settings)
       await expect(Promise.all([first, second, forced])).resolves.toEqual([
-        settings,
-        settings,
-        settings,
+        applyGatewayPublicSettings(settings),
+        applyGatewayPublicSettings(settings),
+        applyGatewayPublicSettings(settings),
       ])
       expect(store.publicSettingsLoaded).toBe(true)
-      expect(store.cachedPublicSettings?.payment_enabled).toBe(true)
+      expect(store.cachedPublicSettings?.payment_enabled).toBe(false)
     })
 
     it('force 在无活动请求时绕过缓存，刷新期间的普通调用等待刷新结果', async () => {
@@ -372,10 +373,10 @@ describe('useAppStore', () => {
       expect(getPublicSettings).toHaveBeenCalledTimes(2)
 
       deferred.resolve(updated)
-      await expect(Promise.all([refresh, duringRefresh])).resolves.toEqual([updated, updated])
+      await expect(Promise.all([refresh, duringRefresh])).resolves.toEqual([applyGatewayPublicSettings(updated), applyGatewayPublicSettings(updated)])
       expect(store.siteName).toBe('Updated Site')
 
-      await expect(store.fetchPublicSettings()).resolves.toEqual(updated)
+      await expect(store.fetchPublicSettings()).resolves.toEqual(applyGatewayPublicSettings(updated))
       expect(getPublicSettings).toHaveBeenCalledTimes(2)
     })
 

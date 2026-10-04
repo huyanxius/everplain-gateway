@@ -3,6 +3,7 @@
  * Manages global UI state including sidebar, loading indicators, and toast notifications
  */
 
+import { EVERPLAIN_SITE_NAME, applyGatewayPublicSettings } from '@/config/everplain'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Toast, ToastType, PublicSettings } from '@/types'
@@ -26,7 +27,7 @@ export const useAppStore = defineStore('app', () => {
   // Public settings cache state
   const publicSettingsLoaded = ref<boolean>(false)
   const publicSettingsLoading = ref<boolean>(false)
-  const siteName = ref<string>('Sub2API')
+  const siteName = ref<string>(EVERPLAIN_SITE_NAME)
   const siteLogo = ref<string>('')
   const siteVersion = ref<string>('')
   const contactInfo = ref<string>('')
@@ -289,18 +290,20 @@ export const useAppStore = defineStore('app', () => {
   /**
    * Apply settings to store state (internal helper to avoid code duplication)
    */
-  function applySettings(config: PublicSettings): void {
+  function applySettings(config: PublicSettings): PublicSettings {
+    config = applyGatewayPublicSettings(config)
     if (typeof window !== 'undefined') {
       window.__APP_CONFIG__ = { ...config }
     }
     cachedPublicSettings.value = config
-    siteName.value = config.site_name || 'Sub2API'
+    siteName.value = config.site_name && config.site_name !== 'Sub2API' ? config.site_name : EVERPLAIN_SITE_NAME
     siteLogo.value = config.site_logo || ''
     siteVersion.value = config.version || ''
     contactInfo.value = config.contact_info || ''
     apiBaseUrl.value = config.api_base_url || ''
     docUrl.value = config.doc_url || ''
     publicSettingsLoaded.value = true
+    return config
   }
 
   /**
@@ -395,8 +398,7 @@ export const useAppStore = defineStore('app', () => {
 
     const request = apiRequest
       .then((data) => {
-        applySettings(data)
-        return data
+        return applySettings(data)
       })
       .catch((error) => {
         console.error('Failed to fetch public settings:', error)

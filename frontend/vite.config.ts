@@ -87,6 +87,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       checker({
+        // `pnpm build` already runs vue-tsc -b before Vite. Avoid a duplicate
+        // concurrent typechecker exhausting constrained build environments.
+        enableBuild: false,
         vueTsc: true
       }),
       injectPublicSettings(backendUrl)
@@ -107,6 +110,7 @@ export default defineConfig(({ mode }) => {
     outDir: '../backend/internal/web/dist',
     emptyOutDir: true,
     rollupOptions: {
+      maxParallelFileOps: 32,
       output: {
         /**
          * 手动分包配置

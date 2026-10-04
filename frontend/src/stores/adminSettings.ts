@@ -1,3 +1,4 @@
+import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { adminAPI } from '@/api'
@@ -59,7 +60,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
     try {
       const [settings, paymentConfigResp] = await Promise.all([
         adminAPI.settings.getSettings(),
-        adminAPI.payment.getConfig()
+        EVERPLAIN_GATEWAY_PROFILE ? Promise.resolve({ data: { enabled: false } }) : adminAPI.payment.getConfig()
       ])
       opsMonitoringEnabled.value = settings.ops_monitoring_enabled ?? true
       writeCachedBool('ops_monitoring_enabled_cached', opsMonitoringEnabled.value)

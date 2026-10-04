@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-dark-950">
+  <div class="everplain-shell min-h-screen bg-gray-50 dark:bg-dark-950">
+    <a class="everplain-skip-link" href="#main-content">{{ t('everplain.skipToContent') }}</a>
     <!-- Background Decoration -->
     <div class="pointer-events-none fixed inset-0 bg-mesh-gradient"></div>
 
@@ -8,14 +9,14 @@
 
     <!-- Main Content Area -->
     <div
-      class="relative min-h-screen transition-all duration-300"
-      :class="[sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64']"
+      class="everplain-main relative min-h-screen transition-all duration-300"
+      :class="{ 'everplain-main-collapsed': sidebarCollapsed }"
     >
       <!-- Header -->
       <AppHeader />
 
       <!-- Main Content -->
-      <main class="p-4 md:p-6 lg:p-8">
+      <main id="main-content" tabindex="-1" class="p-4 md:p-6 lg:p-8">
         <slot />
       </main>
     </div>
@@ -24,6 +25,8 @@
 
 <script setup lang="ts">
 import '@/styles/onboarding.css'
+import { useI18n } from 'vue-i18n'
+import { EVERPLAIN_GATEWAY_PROFILE } from '@/config/everplain'
 import { computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores'
 import { useAuthStore } from '@/stores/auth'
@@ -32,6 +35,7 @@ import { useOnboardingStore } from '@/stores/onboarding'
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
 
+const { t } = useI18n()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
@@ -39,7 +43,7 @@ const isAdmin = computed(() => authStore.user?.role === 'admin')
 
 const { replayTour } = useOnboardingTour({
   storageKey: isAdmin.value ? 'admin_guide' : 'user_guide',
-  autoStart: true
+  autoStart: !EVERPLAIN_GATEWAY_PROFILE
 })
 
 const onboardingStore = useOnboardingStore()

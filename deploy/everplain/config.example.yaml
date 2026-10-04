@@ -1,0 +1,68 @@
+# Everplain-only, single-tenant gateway. No production deployment is included.
+# Copy into an isolated DATA_DIR; use environment variables for credentials.
+run_mode: simple
+simple_mode_key_rate_limit_enabled: false
+everplain:
+  enabled: true
+  upstream_enabled: false # Only enable after an authorized provider is configured and verified.
+  requests_per_minute: 60 # Per authenticated service key, shared Redis counter.
+  request_timeout_seconds: 120
+server:
+  host: 127.0.0.1
+  port: 18081
+  mode: release
+  max_request_body_size: 4194304
+  trusted_proxies: []
+security:
+  trust_forwarded_ip_for_api_key_acl: false
+  url_allowlist:
+    enabled: true
+    allow_private_hosts: false
+    allow_insecure_http: false
+# Small starting point, not a production sizing/SLO promise.
+database:
+  max_open_conns: 10
+  max_idle_conns: 2
+redis:
+  pool_size: 16
+  min_idle_conns: 2
+gateway:
+  max_body_size: 4194304
+  text_max_body_size: 4194304
+  max_idle_conns: 32
+  max_idle_conns_per_host: 8
+  max_conns_per_host: 16
+  max_account_switches: 2
+  max_account_switches_gemini: 2
+  usage_record:
+    worker_count: 4
+    queue_size: 256
+    task_timeout_seconds: 5
+    overflow_policy: sync
+    auto_scale_enabled: false
+    auto_scale_min_workers: 4
+    auto_scale_max_workers: 4
+  openai_ws:
+    enabled: false
+  cn_providers:
+    balance_check_enabled: false
+ops:
+  aggregation:
+    enabled: false
+dashboard_aggregation:
+  enabled: false
+batch_image:
+  enabled: false
+  queue_enabled: false
+image_storage:
+  enabled: false
+log:
+  level: warn
+  output:
+    to_stdout: true
+    to_file: false
+
+# Use bundled pricing until an operator explicitly chooses remote updates.
+pricing:
+  remote_url: ""
+  hash_url: ""
