@@ -28,6 +28,7 @@
               <span class="everplain-meta">{{ t('everplain.agyReserved') }}</span>
               <h3>{{ t(status.provider.state === 'unconfigured' ? 'everplain.notConfigured' : 'everplain.configuredUnverified') }}</h3>
               <p>{{ t('everplain.providerDescription') }}</p>
+              <a href="https://antigravity.google/terms" target="_blank" rel="noopener noreferrer">{{ t('everplain.providerTerms') }}</a>
             </div>
             <span class="everplain-state"><span aria-hidden="true"></span>{{ t(status.upstream_enabled ? 'everplain.upstreamEnabled' : 'everplain.upstreamDisabled') }}</span>
           </div>

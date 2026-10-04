@@ -3,7 +3,7 @@ export default {
     "overview": "概览",
     "overviewDescription": "统一管理上游接入、模型路由、密钥与用量。",
     "upstreamAccounts": "上游账号",
-    "upstreamAccountsDescription": "管理上游连接与凭据。AGY 仅预留入口，尚未验证。",
+    "upstreamAccountsDescription": "管理获授权的上游 API 连接与凭据。",
     "modelRouting": "模型路由",
     "modelRoutingDescription": "通过上游分组控制账号选择与模型路由。",
     "navigation": "网关导航",
@@ -16,8 +16,8 @@ export default {
     "statusUnavailableDescription": "请检查网络连接与服务端版本后重试。目前无法判断上游是否可用。",
     "notConfigured": "未配置",
     "configuredUnverified": "已配置 · 未验证",
-    "agyReserved": "AGY 预留适配入口",
-    "providerDescription": "请在另行完成供应商验证后配置凭据。此构建不配置或测试真实 AGY 账号。",
+    "agyReserved": "上游模型服务",
+    "providerDescription": "尚未连接或验证真实上游。Google 条款限制第三方 Antigravity OAuth 使用；授权和账号使用由你自行选择。不要向聊天发送密码、Cookie 或令牌。",
     "upstreamDisabled": "上游请求已关闭",
     "upstreamEnabled": "上游请求已开启 · 未验证",
     "policy": "请求策略",
@@ -46,6 +46,7 @@ export default {
     "summary": "配置摘要",
     "notVerified": "未验证",
     "modelRoutingNote": "路由沿用上游分组机制。编辑分组可设置模型规则与账号选择；账号级模型映射仍在账号编辑器中。",
-    "accountsNote": "AGY 仅为未配置的适配入口。此构建未接入真实凭据、连接测试或生产调用。"
+    "accountsNote": "此构建未接入或测试真实账号。Antigravity OAuth 完整流程会访问 Google、可能初始化项目并修改隐私设置；请先阅读接入说明，自行决定是否授权。",
+    "providerTerms": "查看 Google Antigravity 条款"
   }
 }

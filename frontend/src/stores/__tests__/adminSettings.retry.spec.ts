@@ -2,9 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useAdminSettingsStore } from '../adminSettings'
 
+const profile = vi.hoisted(() => ({ enabled: false }))
+vi.mock('@/config/everplain', () => ({ get EVERPLAIN_GATEWAY_PROFILE() { return profile.enabled } }))
+
 const mocks = vi.hoisted(() => ({ getSettings: vi.fn(), getConfig: vi.fn() }))
 vi.mock('@/api', () => ({ adminAPI: { settings: { getSettings: mocks.getSettings }, payment: { getConfig: mocks.getConfig } } }))
 beforeEach(() => {
+  profile.enabled = false
   vi.clearAllMocks()
   localStorage.clear()
   setActivePinia(createPinia())
@@ -47,5 +51,30 @@ describe('admin settings fetch retry', () => {
     await store.fetch()
     expect(mocks.getSettings).toHaveBeenCalledTimes(1)
     expect(mocks.getConfig).toHaveBeenCalledTimes(1)
+  })
+})
+
+
+describe('standalone gateway admin settings', () => {
+  it('never reads the closed payment endpoint, even if it would fail', async () => {
+    profile.enabled = true
+    mocks.getConfig.mockRejectedValue(new Error('Payment is disabled'))
+    const store = useAdminSettingsStore()
+    await store.fetch()
+    expect(store.loaded).toBe(true)
+    expect(store.paymentEnabled).toBe(false)
+    expect(mocks.getConfig).not.toHaveBeenCalled()
+    expect(store.customMenuItems).toEqual([{ id: 'custom', title: 'Custom' }])
+  })
+  it('still retries a genuine settings failure under the gateway profile', async () => {
+    profile.enabled = true
+    mocks.getSettings.mockRejectedValueOnce(new Error('Offline'))
+    const store = useAdminSettingsStore()
+    await store.fetch()
+    expect(store.loaded).toBe(false)
+    await store.fetch()
+    expect(store.loaded).toBe(true)
+    expect(mocks.getSettings).toHaveBeenCalledTimes(2)
+    expect(mocks.getConfig).not.toHaveBeenCalled()
   })
 })

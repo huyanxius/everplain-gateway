@@ -15,6 +15,7 @@ Everplain keeps the end-user credit ledger. This service supplies model access t
 1. Read [the API and usage contract](docs/everplain/CONTRACT.md).
 2. Build with [the development guide](docs/everplain/DEVELOPMENT.md), Go **1.27.0**, and pnpm.
 3. Use [the lightweight configuration](deploy/everplain/config.example.yaml); do not inherit the upstream high-throughput example pools by accident.
-4. Read [upstream provenance and launch/license checks](docs/everplain/UPSTREAM.md).
+4. Review [provider authorization and safe onboarding](docs/everplain/PROVIDER_SETUP.md); including the retained manual Antigravity OAuth flow, its side effects, and applicable terms.
+5. Read [upstream provenance and launch/license checks](docs/everplain/UPSTREAM.md).
 
 The original README files, LICENSE and attribution remain unchanged. The upstream README contains a separate commercial-authorization statement and provider-terms warnings. This fork does not claim that either issue has been cleared for a commercial launch.

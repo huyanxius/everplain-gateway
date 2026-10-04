@@ -151,3 +151,5 @@ textarea.input { border-radius: var(--qx-radius-field); padding-block: var(--qx-
 .everplain-shell button.settings-tab-active { border-color: transparent; background: var(--qx-color-surface); color: var(--qx-color-ink); box-shadow: var(--qx-shadow-card); }
 .everplain-shell button.settings-tab-active::after { display: none; }
 .everplain-shell button.settings-tab .settings-tab-icon { background: transparent; color: inherit; }
+
+.everplain-provider a { display: inline-block; margin-top: var(--qx-space-2); color: var(--qx-color-accent); font-size: var(--qx-text-control); line-height: var(--qx-text-control--line-height); text-decoration: underline; }

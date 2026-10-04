@@ -12,7 +12,7 @@ The profile has soft operational budget semantics. Its Redis RPM cap limits requ
 
 ## Default state
 
-`everplain.enabled=true`, `run_mode=simple`, `everplain.upstream_enabled=false`. Requests to generate content return HTTP 503 `provider_not_configured` after service-key authentication. No default account, real credential or live provider call is introduced. AGY is an adapter placeholder pointing at the existing Antigravity implementation; account OAuth, privacy and onboarding operations have not been performed.
+`everplain.enabled=true`, `run_mode=simple`, `everplain.upstream_enabled=false`. Requests to generate content return HTTP 503 `provider_not_configured` after service-key authentication. No default account, real credential or live provider call is introduced. AGY is an adapter placeholder pointing at the existing Antigravity implementation; account OAuth, privacy and onboarding operations have not been performed. Personal Antigravity subscription OAuth has material provider-terms and account-side-effect risks; see [provider authorization](PROVIDER_SETUP.md).
 
 An administrator can read `GET /api/v1/admin/everplain/status` with the existing admin JWT or upstream admin authentication. Response uses the panel envelope `{code:0,data:{...}}`. `provider.state` is `unconfigured` while the upstream switch is off; when switched on it is `configured_unverified`. The switch is an operator acknowledgement, **not a successful credential/model readiness probe**. `provider.verification` remains `not_performed`; no synthetic success or green health badge is returned for an unverified account.
 

@@ -31,6 +31,7 @@ describe('Everplain gateway overview', () => {
     expect(wrapper.text()).toContain('everplain.upstreamDisabled')
     expect(wrapper.text()).toContain('everplain.eventualUsage')
     expect(wrapper.text()).toContain('everplain.emptyActivity')
+    expect(wrapper.get('a[href="https://antigravity.google/terms"]').text()).toContain('everplain.providerTerms')
     expect(wrapper.findAll('.everplain-workspace-link')).toHaveLength(4)
     wrapper.unmount()
   })

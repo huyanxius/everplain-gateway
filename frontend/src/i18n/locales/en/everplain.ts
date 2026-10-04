@@ -3,7 +3,7 @@ export default {
     "overview": "Overview",
     "overviewDescription": "One place for upstream access, routing, keys, and usage.",
     "upstreamAccounts": "Upstream accounts",
-    "upstreamAccountsDescription": "Manage upstream connections and credentials. AGY is reserved and unverified.",
+    "upstreamAccountsDescription": "Manage authorized upstream API connections and credentials.",
     "modelRouting": "Model routing",
     "modelRoutingDescription": "Use upstream groups to control account selection and model routing.",
     "navigation": "Gateway navigation",
@@ -16,8 +16,8 @@ export default {
     "statusUnavailableDescription": "Check the connection and server version, then try again. Provider readiness cannot be determined.",
     "notConfigured": "Not configured",
     "configuredUnverified": "Configured · unverified",
-    "agyReserved": "AGY adapter reserved",
-    "providerDescription": "Add credentials only after a separate provider verification step. This build does not configure or test a live AGY account.",
+    "agyReserved": "Upstream model service",
+    "providerDescription": "No live upstream is connected or verified. Google terms restrict third-party Antigravity OAuth use; the operator chooses whether to authorize and use an account. Do not send passwords, cookies, or tokens through chat.",
     "upstreamDisabled": "Upstream requests are disabled",
     "upstreamEnabled": "Upstream requests enabled · unverified",
     "policy": "Request policy",
@@ -46,6 +46,7 @@ export default {
     "summary": "Configuration summary",
     "notVerified": "Not verified",
     "modelRoutingNote": "Routing uses upstream groups. Edit a group to set model rules and account selection; account-specific model mapping remains in the account editor.",
-    "accountsNote": "AGY is an unconfigured adapter entry. No live credentials, connection tests, or production calls are included in this build."
+    "accountsNote": "No live account is connected or tested. Full Antigravity OAuth setup contacts Google, may onboard a project, and changes privacy settings. Review the setup notes and decide whether to authorize.",
+    "providerTerms": "Read Google Antigravity terms"
   }
 }
