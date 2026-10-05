@@ -70,6 +70,39 @@ jobs:
       - name: Build complete frontend
         working-directory: frontend
         run: pnpm build
+      - name: Setup Go for complete gateway build
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: backend/go.mod
+          check-latest: false
+          cache: true
+          cache-dependency-path: backend/go.sum
+      - name: Build complete embedded gateway
+        working-directory: backend
+        env:
+          CGO_ENABLED: '0'
+          GOOS: linux
+          GOARCH: amd64
+          GOMAXPROCS: '2'
+          GOGC: '50'
+          GOMEMLIMIT: 2GiB
+        run: |
+          go version | grep -q 'go1.27.0'
+          VERSION_VALUE="$(./scripts/resolve-version.sh)"
+          go build -p 2 -tags embed -trimpath \
+            -ldflags="-s -w -X main.Version=${VERSION_VALUE} -X main.Commit=${GITHUB_SHA} -X main.BuildType=release" \
+            -o bin/everplain-gateway-linux-amd64 ./cmd/server
+          sha256sum bin/everplain-gateway-linux-amd64 > bin/everplain-gateway-linux-amd64.sha256
+      - name: Save complete gateway build (not a deployment)
+        uses: actions/upload-artifact@v7
+        with:
+          name: everplain-gateway-linux-amd64
+          path: |
+            backend/bin/everplain-gateway-linux-amd64
+            backend/bin/everplain-gateway-linux-amd64.sha256
+            LICENSE
+            EVERPLAIN.md
+          retention-days: 7
       - name: Package read-only local preview
         run: |
           mkdir -p "$RUNNER_TEMP/everplain-preview/dist"
