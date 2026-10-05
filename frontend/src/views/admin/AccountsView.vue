@@ -1,5 +1,6 @@
 <template>
   <AppLayout>
+    <div class="everplain-notice mb-6" role="note">{{ t('everplain.accountsNote') }}</div>
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap-reverse items-start justify-between gap-3">

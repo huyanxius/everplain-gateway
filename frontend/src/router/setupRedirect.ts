@@ -1,7 +1,7 @@
-export function resolveCompletedSetupRedirectPath(isAuthenticated: boolean, isAdmin: boolean): string {
+export function resolveCompletedSetupRedirectPath(isAuthenticated: boolean, isAdmin: boolean, gatewayOwner = false): string {
   if (!isAuthenticated) {
     return '/login'
   }
 
-  return isAdmin ? '/admin/dashboard' : '/dashboard'
+  return isAdmin ? (gatewayOwner ? '/admin/everplain-gateway' : '/admin/dashboard') : '/dashboard'
 }

@@ -182,10 +182,12 @@ func NeedsSetup() bool {
 }
 
 func buildPostgresDSN(cfg *DatabaseConfig, dbName string) string {
-	return fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, dbName, cfg.SSLMode,
-	)
+	// Keep setup aligned with the runtime DSN builder: an empty password
+	// must be omitted, otherwise lib/pq consumes the next keyword as its value.
+	return (&config.DatabaseConfig{
+		Host: cfg.Host, Port: cfg.Port, User: cfg.User, Password: cfg.Password,
+		DBName: dbName, SSLMode: cfg.SSLMode,
+	}).DSN()
 }
 
 func isDatabaseNotFoundError(err error) bool {

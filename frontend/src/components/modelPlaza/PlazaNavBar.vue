@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+import { getAdminLandingPath } from '@/api/admin/everplainGateway'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { sanitizeUrl } from '@/utils/url'
@@ -57,5 +58,5 @@ const siteLogo = computed(() =>
   sanitizeUrl(settings.value?.site_logo || '', { allowRelative: true, allowDataUrl: true })
 )
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const backTarget = computed(() => (authStore.isAdmin ? '/admin/dashboard' : '/dashboard'))
+const backTarget = computed(() => (authStore.isAdmin ? getAdminLandingPath(authStore.user) : '/dashboard'))
 </script>

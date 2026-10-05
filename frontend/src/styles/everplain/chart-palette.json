@@ -1,0 +1,49 @@
+{
+  "source_blob": "e0a71a0197feab710e8540923cd0834fa32ea15b",
+  "colors": {
+    "ink-soft": [
+      "#303030",
+      "#c9ccc6"
+    ],
+    "rule": [
+      "#e3e3e3",
+      "#383d38"
+    ],
+    "faint": [
+      "#969696",
+      "#92998f"
+    ],
+    "data-blue": [
+      "#43639a",
+      "#95a5c0"
+    ],
+    "data-green": [
+      "#44745f",
+      "#9db9ad"
+    ],
+    "data-amber": [
+      "#8a6b2f",
+      "#c6b390"
+    ],
+    "data-rose": [
+      "#985067",
+      "#bc9aa5"
+    ],
+    "data-violet": [
+      "#695b91",
+      "#a59eb7"
+    ],
+    "data-teal": [
+      "#367083",
+      "#94b6c2"
+    ],
+    "data-rust": [
+      "#925c49",
+      "#bda299"
+    ],
+    "data-olive": [
+      "#718a72",
+      "#a7afa9"
+    ]
+  }
+}

@@ -45,6 +45,8 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=3072
     steps:
       - uses: actions/checkout@v6
       - name: Setup pnpm
@@ -62,6 +64,57 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Frontend typecheck and critical vitest
         run: make test-frontend
+      - name: Full frontend suite
+        working-directory: frontend
+        run: pnpm test:run --maxWorkers=1 --minWorkers=1 --no-file-parallelism
+      - name: Build complete frontend
+        working-directory: frontend
+        run: pnpm build
+      - name: Setup Go for complete gateway build
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: backend/go.mod
+          check-latest: false
+          cache: true
+          cache-dependency-path: backend/go.sum
+      - name: Build complete embedded gateway
+        working-directory: backend
+        env:
+          CGO_ENABLED: '0'
+          GOOS: linux
+          GOARCH: amd64
+          GOMAXPROCS: '2'
+          GOGC: '50'
+          GOMEMLIMIT: 2GiB
+        run: |
+          go version | grep -q 'go1.27.0'
+          VERSION_VALUE="$(./scripts/resolve-version.sh)"
+          go build -p 2 -tags embed -trimpath \
+            -ldflags="-s -w -X main.Version=${VERSION_VALUE} -X main.Commit=${GITHUB_SHA} -X main.BuildType=release" \
+            -o bin/everplain-gateway-linux-amd64 ./cmd/server
+          sha256sum bin/everplain-gateway-linux-amd64 > bin/everplain-gateway-linux-amd64.sha256
+      - name: Save complete gateway build (not a deployment)
+        uses: actions/upload-artifact@v7
+        with:
+          name: everplain-gateway-linux-amd64
+          path: |
+            backend/bin/everplain-gateway-linux-amd64
+            backend/bin/everplain-gateway-linux-amd64.sha256
+            LICENSE
+            EVERPLAIN.md
+          retention-days: 7
+      - name: Package read-only local preview
+        run: |
+          mkdir -p "$RUNNER_TEMP/everplain-preview/dist"
+          cp -R backend/internal/web/dist/. "$RUNNER_TEMP/everplain-preview/dist/"
+          cp tools/everplain/preview.py tools/everplain/PREVIEW.md LICENSE "$RUNNER_TEMP/everplain-preview/"
+          printf 'Full-feature source commit: %s\nNo real account, provider or payment is connected.\n' "$GITHUB_SHA" > "$RUNNER_TEMP/everplain-preview/BUILD.txt"
+      - name: Save local preview artifact (not a deployment)
+        uses: actions/upload-artifact@v7
+        with:
+          name: everplain-full-ui-preview
+          path: ${{ runner.temp }}/everplain-preview/
+          retention-days: 7
 
   golangci-lint:
     runs-on: ubuntu-latest

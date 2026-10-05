@@ -1,3 +1,4 @@
+import { getAdminLandingPath, isGatewayOwner } from '@/api/admin/everplainGateway'
 /**
  * Vue Router configuration for Sub2API frontend
  * Defines all application routes with lazy loading and navigation guards
@@ -400,7 +401,7 @@ const routes: RouteRecordRaw[] = [
   // ==================== Admin Routes ====================
   {
     path: '/admin',
-    redirect: '/admin/dashboard'
+    redirect: () => getAdminLandingPath(useAuthStore().user)
   },
   {
     path: '/admin/dashboard',
@@ -412,6 +413,18 @@ const routes: RouteRecordRaw[] = [
       title: 'Admin Dashboard',
       titleKey: 'admin.dashboard.title',
       descriptionKey: 'admin.dashboard.description'
+    }
+  },
+  {
+    path: '/admin/everplain-gateway',
+    name: 'EverplainGateway',
+    component: () => import('@/views/admin/EverplainGatewayView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Unified Gateway',
+      titleKey: 'everplain.gateway.title',
+      descriptionKey: 'everplain.gateway.description'
     }
   },
   {
@@ -808,7 +821,7 @@ router.beforeEach(async (to, _from, next) => {
     try {
       const status = await getSetupStatus()
       if (!status.needs_setup) {
-        next(resolveCompletedSetupRedirectPath(authStore.isAuthenticated, authStore.isAdmin))
+        next(resolveCompletedSetupRedirectPath(authStore.isAuthenticated, authStore.isAdmin, isGatewayOwner(authStore.user)))
         return
       }
     } catch {
@@ -827,7 +840,7 @@ router.beforeEach(async (to, _from, next) => {
         return
       }
       // Admin users go to admin dashboard, regular users go to user dashboard
-      next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+      next(authStore.isAdmin ? getAdminLandingPath(authStore.user) : '/dashboard')
       return
     }
     // Model Plaza:公开路由但受「启用开关 + 可选强制登录」双重控制(后端同口径 fail-closed)
@@ -845,7 +858,7 @@ router.beforeEach(async (to, _from, next) => {
         next(
           authStore.isAuthenticated
             ? authStore.isAdmin
-              ? '/admin/dashboard'
+              ? getAdminLandingPath(authStore.user)
               : '/dashboard'
             : '/home'
         )
@@ -923,7 +936,7 @@ router.beforeEach(async (to, _from, next) => {
     appStore.publicSettingsLoaded &&
     appStore.cachedPublicSettings?.payment_enabled === false
   ) {
-    next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+    next(authStore.isAdmin ? getAdminLandingPath(authStore.user) : '/dashboard')
     return
   }
 
@@ -942,7 +955,7 @@ router.beforeEach(async (to, _from, next) => {
     appStore.publicSettingsLoaded &&
     appStore.cachedPublicSettings?.subscription_enabled === false
   ) {
-    next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+    next(authStore.isAdmin ? getAdminLandingPath(authStore.user) : '/dashboard')
     return
   }
 
@@ -957,7 +970,7 @@ router.beforeEach(async (to, _from, next) => {
 
     if (restrictedPaths.some((path) => to.path.startsWith(path))) {
       // 简易模式下访问受限页面,重定向到仪表板
-      next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+      next(authStore.isAdmin ? getAdminLandingPath(authStore.user) : '/dashboard')
       return
     }
   }
