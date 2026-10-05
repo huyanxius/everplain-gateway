@@ -355,6 +355,8 @@ func registerGroupRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 }
 
 func registerAccountRoutes(admin *gin.RouterGroup, h *handler.Handlers, stepUpAuth middleware.StepUpAuthMiddleware) {
+	// Owner-scoped safe inventory; existing account management routes are unchanged.
+	admin.GET("/everplain-gateway/upstreams", h.Admin.Account.ListEverplainGatewayUpstreams)
 	accounts := admin.Group("/accounts")
 	{
 		accounts.GET("", h.Admin.Account.List)
