@@ -21,7 +21,8 @@ No current Qiniu catalog, existing provider key, provider account, production da
 
 ## Pending or unverified
 
-- Complete backend unit run is still being checked; do not substitute focused/package passes for final aggregate success. Integration and golangci-lint are not yet verified on this source candidate.
+- Complete backend unit aggregate exited **1**: 57 packages passed, but the original service package failed two parameter-matrix subtests because their public vendor hostnames could not resolve, and three plugin-host tests because Unix sockets are denied in this sandbox (`socket: operation not permitted`). Do not disable DNS/SSRF validation or plugin capabilities to make the candidate pass. Rerun on CI with the required capabilities. A proposed DNS-independent test fixture was not published because its recompile was interrupted by resource pressure. Integration and golangci-lint are not verified.
+- The full Go embed binary build did not pass. The first attempt ended without a usable binary; the retry reported `/tmp` exhaustion. A complete backend production binary is not claimed. Further large local Go checks are paused to avoid blocking other work; only regenerable compilation caches and exited build directories were removed, while source and check results were retained.
 - No GitHub Actions pass is claimed. No workflow enablement or permission expansion was performed.
 - Browser pixel review: my cloud browser returned `net::ERR_BLOCKED_BY_CLIENT` for the loopback-only preview. Source/component checks and a successful build do not verify screenshots, mobile layout or dark-mode pixels.
 - Docker Compose rendered configuration and container startup were not verified. No staging instance was provisioned.
