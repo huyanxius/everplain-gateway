@@ -200,6 +200,7 @@
 </template>
 
 <script setup lang="ts">
+import { getAdminLandingPath, isGatewayOwner } from '@/api/admin/everplainGateway'
 import { EVERPLAIN_BRANDING } from '@/config/everplain'
 import { useMediaQuery } from '@vueuse/core'
 import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -269,7 +270,7 @@ const isAdmin = computed(() => authStore.isAdmin)
 const sidebarNavRef = ref<HTMLElement | null>(null)
 const isDark = ref(document.documentElement.classList.contains('dark'))
 
-const homePath = computed(() => (isAdmin.value ? '/admin/dashboard' : '/dashboard'))
+const homePath = computed(() => (isAdmin.value ? getAdminLandingPath(authStore.user) : '/dashboard'))
 
 // Per-group expand/collapse overrides. A group with no entry follows the
 // automatic behavior (expanded while the active route is one of its children);
@@ -792,7 +793,8 @@ const customMenuItemsForAdmin = computed(() => {
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
   const baseItems: NavItem[] = [
-    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon },
+    ...(isGatewayOwner(authStore.user) ? [{ path: '/admin/everplain-gateway', label: t('everplain.gateway.title'), icon: GlobeIcon }] : []),
+    { path: '/admin/dashboard', label: isGatewayOwner(authStore.user) ? t('everplain.gateway.systemDashboard') : t('nav.dashboard'), icon: DashboardIcon },
     { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring },
     { path: '/admin/users', label: t('nav.users'), icon: UsersIcon, hideInSimpleMode: true },
     { path: '/admin/groups', label: t('nav.groups'), icon: FolderIcon },
