@@ -1,0 +1,21 @@
+# Source-build overlay for an independent, isolated candidate.
+# Requires Docker Compose >= 2.24.4 for !override; do not use it on a live project.
+# Combine with docker-compose.yml using project name everplain-gateway-staging.
+services:
+  sub2api:
+    image: everplain-gateway:${EVERPLAIN_SOURCE_COMMIT:?Set the verified source commit}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        COMMIT: ${EVERPLAIN_SOURCE_COMMIT:?Set the verified source commit}
+        VERSION: everplain-${EVERPLAIN_SOURCE_COMMIT:?Set the verified source commit}
+    container_name: everplain-gateway-staging
+    ports: !override
+      - "127.0.0.1:${EVERPLAIN_STAGING_PORT:-8088}:8080"
+    environment:
+      - ADMIN_EMAIL=huyanxius@gmail.com
+  postgres:
+    container_name: everplain-gateway-staging-postgres
+  redis:
+    container_name: everplain-gateway-staging-redis
